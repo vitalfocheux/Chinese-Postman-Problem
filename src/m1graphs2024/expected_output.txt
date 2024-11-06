@@ -1,0 +1,599 @@
+************ PART 1. UNWEIGTED DIRECTED GRAPHS ***********************
+
+>>>>>>>> SIMPLE GRAPH >>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>> Creating the subject example graph in G
+>>>> Graph information
+>> DOT representation
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 4
+	3 -> 6
+	4 -> 2
+	4 -> 3
+	4 -> 5
+	4 -> 8
+	6 -> 4
+	6 -> 7
+	7 -> 3
+	8 -> 7
+}
+
+8 nodes, 11 edges
+>> Nodes:
+Node 1: degree 2 (in: 0/ out: 2)
+Node 2: degree 2 (in: 2/ out: 0)
+Node 3: degree 3 (in: 2/ out: 1)
+Node 4: degree 6 (in: 2/ out: 4)
+Node 5: degree 1 (in: 1/ out: 0)
+Node 6: degree 3 (in: 1/ out: 2)
+Node 7: degree 3 (in: 2/ out: 1)
+Node 8: degree 2 (in: 1/ out: 1)
+>> Edges:
+---------------------------
+Out-edges per node
+1: [1->2, 1->4]
+2: []
+3: [3->6]
+4: [4->2, 4->3, 4->5, 4->8]
+5: []
+6: [6->4, 6->7]
+7: [7->3]
+8: [8->7]
+In-edges per node
+1: []
+2: [1->2, 4->2]
+3: [4->3, 7->3]
+4: [1->4, 6->4]
+5: [4->5]
+6: [3->6]
+7: [6->7, 8->7]
+8: [4->8]
+
+>>>>>>>> creating isolated node 12
+Graph now:
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 4
+	3 -> 6
+	4 -> 2
+	4 -> 3
+	4 -> 5
+	4 -> 8
+	6 -> 4
+	6 -> 7
+	7 -> 3
+	8 -> 7
+	12
+}
+
+9 nodes, 11 edges
+Nodes list: [1, 2, 3, 4, 5, 6, 7, 8, 12]
+
+>>>>>>>> Removing node 3
+Graph now:
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 4
+	4 -> 2
+	4 -> 5
+	4 -> 8
+	6 -> 4
+	6 -> 7
+	8 -> 7
+	12
+}
+
+8 nodes, 8 edges
+Nodes list: [1, 2, 4, 5, 6, 7, 8, 12]
+>> Edges:
+---------------------------
+Out-edges per node
+1: [1->2, 1->4]
+2: []
+4: [4->2, 4->5, 4->8]
+5: []
+6: [6->4, 6->7]
+7: []
+8: [8->7]
+12: []
+In-edges per node
+1: []
+2: [1->2, 4->2]
+4: [1->4, 6->4]
+5: [4->5]
+6: []
+7: [6->7, 8->7]
+8: [4->8]
+12: []
+
+>>>>>>>> Recreating edges (4, 3), (3, 6), (7, 3), adding edge (12, 3), creating edge (3, 25)
+Graph now:
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 4
+	3 -> 6
+	3 -> 25
+	4 -> 2
+	4 -> 3
+	4 -> 5
+	4 -> 8
+	6 -> 4
+	6 -> 7
+	7 -> 3
+	8 -> 7
+	12 -> 3
+}
+
+10 nodes, 13 edges
+Nodes list: [1, 2, 3, 4, 5, 6, 7, 8, 12, 25]
+
+
+>>>>>>>>  Edges removal
+>>>> Removing existing edges (7, 3) and (4, 8)
+>>>> Removing absent edge (3, 4)
+>>>> Removing edges whith 1 or 2 not existing end-points: (-3, 4), (6, 0), (4, 11), (-1, -2), (13, 3), (9, 10)
+Graph now:
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 4
+	3 -> 6
+	3 -> 25
+	4 -> 2
+	4 -> 3
+	4 -> 5
+	6 -> 4
+	6 -> 7
+	8 -> 7
+	12 -> 3
+}
+
+10 nodes, 11 edges
+Nodes list: [1, 2, 3, 4, 5, 6, 7, 8, 12, 25]
+
+Testing that getSuccessors and getSuccessorsMulti give the same result for the simple graph
+getSuccessors and getSuccessorsMulti are identical
+
+>>>>>>>> MULTIGRAPH: adding a self-loop on node 6, and a second edge (1, 4)
+Graph now:
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 4
+	1 -> 4
+	3 -> 6
+	3 -> 25
+	4 -> 2
+	4 -> 3
+	4 -> 5
+	6 -> 4
+	6 -> 6
+	6 -> 7
+	8 -> 7
+	12 -> 3
+}
+
+10 nodes, 13 edges
+Nodes list: [1, 2, 3, 4, 5, 6, 7, 8, 12, 25]
+Degree of node 6: 5 (in: 2/ out: 3)
+>> Edges:
+---------------------------
+Out-edges per node
+1: [1->2, 1->4, 1->4]
+2: []
+3: [3->6, 3->25]
+4: [4->2, 4->3, 4->5]
+5: []
+6: [6->4, 6->6, 6->7]
+7: []
+8: [8->7]
+12: [12->3]
+25: []
+In-edges per node
+1: []
+2: [1->2, 4->2]
+3: [4->3, 12->3]
+4: [1->4, 1->4, 6->4]
+5: [4->5]
+6: [3->6, 6->6]
+7: [6->7, 8->7]
+8: []
+12: []
+25: [3->25]
+
+>>>>>>>>>>    Get the reverse graph
+digraph {
+	rankdir=LR
+	2 -> 1
+	2 -> 4
+	3 -> 4
+	3 -> 12
+	4 -> 1
+	4 -> 1
+	4 -> 6
+	5 -> 4
+	6 -> 3
+	6 -> 6
+	7 -> 6
+	7 -> 8
+	25 -> 3
+}
+
+>>>>>>>>>>    Get the transitive closure
+digraph {
+	rankdir=LR
+	1 -> 2
+	1 -> 3
+	1 -> 4
+	1 -> 5
+	1 -> 6
+	1 -> 7
+	1 -> 25
+	3 -> 2
+	3 -> 4
+	3 -> 5
+	3 -> 6
+	3 -> 7
+	3 -> 25
+	4 -> 2
+	4 -> 3
+	4 -> 5
+	4 -> 6
+	4 -> 7
+	4 -> 25
+	6 -> 2
+	6 -> 3
+	6 -> 4
+	6 -> 5
+	6 -> 7
+	6 -> 25
+	8 -> 7
+	12 -> 2
+	12 -> 3
+	12 -> 4
+	12 -> 5
+	12 -> 6
+	12 -> 7
+	12 -> 25
+}
+
+>>>>>>>>>>    Emptying the graph by removing all its nodes
+Graph now:
+digraph {
+	rankdir=LR
+}
+
+>>>> Searching for node 7
+There is no Node 7
+>>>> Searching for edge (4, 2)
+There is no edge (4, 2)
+
+********* PART 2. READING GRAPHS FROM DOT FILES **************
+
+>>> Graph with isolated nodes: reading file 'isolatedNodes.gv'
+Read: OK. The graph with isolated nodes has been read as:
+---------------------
+digraph {
+	rankdir=LR
+	1
+	2 -> 3
+	4
+	5
+	8
+}
+
+---------------------
+>>> Simple graph: reading file 'simpleGraph.gv'
+Read: OK. The simple graph has been read as:
+---------------------
+digraph {
+	rankdir=LR
+	1 -> 2
+	2 -> 3
+	2 -> 4
+	2 -> 5
+	3 -> 1
+	3 -> 5
+	4 -> 1
+	4 -> 5
+	6 -> 5
+}
+
+---------------------
+
+>>> Multi-graph: reading file 'multiGraph.gv'
+Read: OK. The multi-graph has been read as:
+---------------------
+digraph {
+	rankdir=LR
+	1 -> 2
+	2 -> 3
+	2 -> 4
+	2 -> 4
+	2 -> 5
+	3 -> 1
+	3 -> 1
+	3 -> 5
+	4 -> 1
+	4 -> 4
+	4 -> 5
+	6 -> 5
+	6 -> 5
+	6 -> 6
+	6 -> 6
+}
+
+---------------------
+Comparing single and multi successors per node for 'multiGraph.gv'
+1 single successors: [2]
+1 multi  successors: [2]
+2 single successors: [3, 4, 5]
+2 multi  successors: [3, 4, 4, 5]
+3 single successors: [1, 5]
+3 multi  successors: [1, 1, 5]
+4 single successors: [1, 4, 5]
+4 multi  successors: [1, 4, 5]
+5 single successors: []
+5 multi  successors: []
+6 single successors: [5, 6]
+6 multi  successors: [5, 5, 6, 6]
+
+
+************ PART 3. WEIGHTED DIRECTED GRAPHS ***********************
+
+>>>>>>>>>>
+Reading a weighted directed simple graph from DOT file 'weightedSimpleGraph.gv'
+Read: OK. The  weighted directed simple graph has been read as:
+---------------------
+digraph {
+	rankdir=LR
+	1 -> 2 [label=4, len=4]
+	2 -> 3 [label=1, len=1]
+	2 -> 4 [label=2, len=2]
+	2 -> 5 [label=3, len=3]
+	3 -> 1 [label=6, len=6]
+	3 -> 5 [label=2, len=2]
+	4 -> 1 [label=0, len=0]
+	4 -> 5 [label=2, len=2]
+	6 -> 5 [label=7, len=7]
+}
+
+---------------------
+The sum of all edges weights equals 27
+
+>>>>>>>>>>
+Reading a weighted directed multi graph from DOT file 'weightedMultiGraph.gv'
+Read: OK. The  weighted directed multi graph has been read as:
+---------------------
+digraph {
+	rankdir=LR
+	1 -> 2 [label=4, len=4]
+	2 -> 3 [label=1, len=1]
+	2 -> 4 [label=2, len=2]
+	2 -> 4 [label=50, len=50]
+	2 -> 5 [label=3, len=3]
+	3 -> 1 [label=3, len=3]
+	3 -> 1 [label=6, len=6]
+	3 -> 5 [label=2, len=2]
+	4 -> 1 [label=0, len=0]
+	4 -> 4 [label=14, len=14]
+	4 -> 5 [label=2, len=2]
+	6 -> 5 [label=7, len=7]
+	6 -> 5 [label=10, len=10]
+	6 -> 6 [label=5, len=5]
+	6 -> 6 [label=8, len=8]
+}
+
+---------------------
+The sum of all edges weights equals 117
+
+
+************ PART 4. UNDIRECTED UNWEIGHTED GRAPHS ***********************
+Creating an undirected simple graph usg from scracth
+graph {
+	rankdir=LR
+	1 -- 2
+	1 -- 3
+	2 -- 3
+	2 -- 4
+	3 -- 4
+}
+
+usg has 4 nodes and 5 edges.
+
+>>>>>> usg: Counting degrees and showing successors
+Node 1. Degree: 2 (In: 2 / Out: 2)
+	Successors: [2, 3]
+Node 2. Degree: 3 (In: 3 / Out: 3)
+	Successors: [1, 3, 4]
+Node 3. Degree: 3 (In: 3 / Out: 3)
+	Successors: [1, 2, 4]
+Node 4. Degree: 2 (In: 2 / Out: 2)
+	Successors: [2, 3]
+>>>>>> usg: Edges of the graph
+// N.B. The edges are printed as though they were directed. This is due to the toString()
+// method that was not overridden. It is possible to do better but not important.
+// What is important is that each edge appears only once per direction.
+All edges of the graph: [1->2, 1->3, 2->3, 2->4, 3->4]
+Out-edges per node
+1: [1->2, 1->3]
+2: [2->1, 2->3, 2->4]
+3: [3->1, 3->2, 3->4]
+4: [4->2, 4->3]
+In-edges per node
+1: [1->2, 1->3]
+2: [2->1, 2->3, 2->4]
+3: [3->1, 3->2, 3->4]
+4: [4->2, 4->3]
+Incident edges per node
+1: [1->2, 1->3]
+2: [2->1, 2->3, 2->4]
+3: [3->1, 3->2, 3->4]
+4: [4->2, 4->3]
+Creating an undirected multi-graph with self-loops umg from scratch
+graph {
+	rankdir=LR
+	1 -- 1
+	1 -- 1
+	1 -- 2
+	1 -- 2
+	1 -- 3
+	2 -- 2
+	2 -- 3
+}
+
+umg has 3 nodes and 7 edges.
+
+>>>>>> umg: Counting degrees and showing successors
+Node 1. Degree: 7 (In: 7 / Out: 7)
+	Successors: [1, 2, 3]
+Node 2. Degree: 5 (In: 5 / Out: 5)
+	Successors: [1, 2, 3]
+Node 3. Degree: 2 (In: 2 / Out: 2)
+	Successors: [1, 2]
+>>>>>> umg: Edges of the graph
+All edges of the graph: [1->1, 1->1, 1->2, 1->2, 1->3, 2->2, 2->3]
+Out-edges per node
+1: [1->1, 1->1, 1->2, 1->2, 1->3]
+2: [2->1, 2->1, 2->2, 2->3]
+3: [3->1, 3->2]
+In-edges per node
+1: [1->1, 1->1, 1->2, 1->2, 1->3]
+2: [2->1, 2->1, 2->2, 2->3]
+3: [3->1, 3->2]
+Incident edges per node
+1: [1->1, 1->1, 1->2, 1->2, 1->3]
+2: [2->1, 2->1, 2->2, 2->3]
+3: [3->1, 3->2]
+
+>>>>>> umg: Successor Array, Adjacency Matrix, and Graph Reverse
+umg Successor array
+[1, 1, 2, 2, 3, 0, 2, 3, 0, 0]
+umg Adjacency Matrix
+	[2, 2, 1]
+	[2, 1, 1]
+	[1, 1, 0]
+Testing via toDotString() the equality with the reverse graph
+DOT of the reverse of umg
+graph {
+	rankdir=LR
+	1 -- 1
+	1 -- 1
+	1 -- 2
+	1 -- 2
+	1 -- 3
+	2 -- 2
+	2 -- 3
+}
+
+Graph gu and its reverse are identical
+-----------------
+      NOW a disconnected GRAPH
+----------------
+Building guDisc, a disconnected undirected graph with multi-edges and self-loops
+graph {
+	rankdir=LR
+	1 -- 1
+	1 -- 1
+	1 -- 2
+	1 -- 2
+	1 -- 6
+	2 -- 2
+	2 -- 3
+	2 -- 6
+	4 -- 6
+	5 -- 6
+	8 -- 9
+	8 -- 10
+}
+
+Comparing single and multi successors per node for guDisc
+1 single successors: [1, 2, 6]
+1 multi  successors: [1, 1, 2, 2, 6]
+2 single successors: [1, 2, 3, 6]
+2 multi  successors: [1, 1, 2, 3, 6]
+3 single successors: [2]
+3 multi  successors: [2]
+4 single successors: [6]
+4 multi  successors: [6]
+5 single successors: [6]
+5 multi  successors: [6]
+6 single successors: [1, 2, 4, 5]
+6 multi  successors: [1, 2, 4, 5]
+8 single successors: [9, 10]
+8 multi  successors: [9, 10]
+9 single successors: [8]
+9 multi  successors: [8]
+10 single successors: [8]
+10 multi  successors: [8]
+>>>> DFS of guDisc: [1, 2, 3, 6, 4, 5, 8, 9, 10]
+>>>> BFS of guDisc: [1, 2, 6, 3, 4, 5, 8, 9, 10]
+>>>>>>> Computing guDisc's transitive closure
+graph {
+	rankdir=LR
+	1 -- 2
+	1 -- 3
+	1 -- 4
+	1 -- 5
+	1 -- 6
+	2 -- 3
+	2 -- 4
+	2 -- 5
+	2 -- 6
+	3 -- 4
+	3 -- 5
+	3 -- 6
+	4 -- 5
+	4 -- 6
+	5 -- 6
+	8 -- 9
+	8 -- 10
+	9 -- 10
+}
+
+
+
+************ PART 4. UNDIRECTED WEIGHTED GRAPHS ***********************
+>>>>>> Reading uwmg an undirected weighted multi-graph with self loops
+from file 'undirWeightedMultiGraph.gv'
+Read: OK. The undirected weighted multi-graph has been read as:
+---------------------
+graph {
+	rankdir=LR
+	1 -- 2 [label=4, len=4]
+	1 -- 3 [label=3, len=3]
+	1 -- 3 [label=6, len=6]
+	1 -- 4 [label=0, len=0]
+	2 -- 3 [label=1, len=1]
+	2 -- 4 [label=2, len=2]
+	2 -- 4 [label=50, len=50]
+	2 -- 5 [label=3, len=3]
+	3 -- 5 [label=2, len=2]
+	4 -- 4 [label=14, len=14]
+	4 -- 5 [label=2, len=2]
+	5 -- 6 [label=7, len=7]
+	5 -- 6 [label=10, len=10]
+	6 -- 6 [label=5, len=5]
+	6 -- 6 [label=8, len=8]
+}
+
+---------------------
+The sum of all edges weights equals 117
+
+Comparing single and multi successors per node for uwmg
+1 single successors: [2, 3, 4]
+1 multi  successors: [2, 3, 3, 4]
+2 single successors: [1, 3, 4, 5]
+2 multi  successors: [1, 3, 4, 4, 5]
+3 single successors: [1, 2, 5]
+3 multi  successors: [1, 1, 2, 5]
+4 single successors: [1, 2, 4, 5]
+4 multi  successors: [1, 2, 2, 4, 5]
+5 single successors: [2, 3, 4, 6]
+5 multi  successors: [2, 3, 4, 6, 6]
+6 single successors: [5, 6]
+6 multi  successors: [5, 5, 6, 6]
