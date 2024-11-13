@@ -2,19 +2,11 @@ import m1graphs2024.Edge;
 import m1graphs2024.UndirectedGraph;
 import m1graphs2024.Node;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 public class ChinesePostman {
+
+    private final Integer INFINITY = Integer.MIN_VALUE;
 
     UndirectedGraph graph;
 
@@ -22,19 +14,72 @@ public class ChinesePostman {
         this.graph = graph;
     }
 
-    public Map<Pair<Node, Node>, Pair<Integer, Node>> floydWarshall(){
-        return null;
+    private Integer weight(Node x, Node y){
+        return graph.getEdges(x, y).get(0).getWeight();
     }
 
-    public Pair<Integer, Integer> lengthPairwiseMatching(){
+    /**
+     * Floyd-Warshall algorithm
+     * @return a map with the shortest path between each pair of nodes where the key is a pair of nodes and the value
+     * is a pair with the length of the shortest path and the predecessor node
+     */
+    public Map<Pair<Node, Node>, Pair<Integer, Node>> floydWarshall(){
+        List<Node> nodes = graph.getAllNodes();
+        Map<Pair<Node, Node>, Pair<Integer, Node>> res = new HashMap<>();
+        for(Node x : nodes){
+            for(Node y : nodes){
+                if(x.equals(y)){
+                    res.put(new Pair<>(x, y), new Pair<>(0, x));
+                }else{
+                    if(graph.existsEdge(x, y)) {
+                        res.put(new Pair<>(x, y), new Pair<>(weight(x, y), x));
+                    }else{
+                        res.put(new Pair<>(x, y), new Pair<>(INFINITY, null));
+                    }
+                }
+            }
+        }
+
+        for(Node z : nodes){
+            for(Node x : nodes){
+                for(Node y : nodes){
+                    //Pair<Node, Node> xz = new Pair<>(x, z);
+                    Pair<Node, Node> zy = new Pair<>(z, y);
+                    Pair<Node, Node> xy = new Pair<>(x, y);
+                    Integer Mxz = res.get(new Pair<>(x, z)).getFirst();
+                    Integer Mzy = res.get(zy).getFirst();
+                    Integer Mxy = res.get(xy).getFirst();
+                    if(!Objects.equals(Mxz, INFINITY) && !Objects.equals(Mzy, INFINITY) && Mxz + Mzy < Mxy){
+                        res.put(xy, new Pair<>(Mxz + Mzy, res.get(zy).getSecond()));
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    public Pair<Integer, Integer> lengthPairwiseMatching(List<Node> v){
         return null;
     }
 
     public List<Pair<Node, Node>> listPairs(Set<Node> v, List<Pair<Node, Node>> currentListsOfPairs, List<Pair<Node, Node>> listsOfPairs){
+        if(v.isEmpty()){
+            listsOfPairs.addAll(currentListsOfPairs);
+        }else{
+            Node x = Collections.min(v);
+            for(Node y : v){
+                if(x.getId() < y.getId()){
+                    v.remove(x);
+                    v.remove(y);
+                    currentListsOfPairs.add(new Pair<>(x, y));
+                    listPairs(v, currentListsOfPairs, listsOfPairs);
+                }
+            }
+        }
         return listsOfPairs;
     }
 
-    public static ChinesePostman fromDotFile(String filename){
+    /*public static ChinesePostman fromDotFile(String filename){
         return fromDotFile(filename, "gv");
     }
 
@@ -98,5 +143,5 @@ public class ChinesePostman {
 
     public String toDotString(){
         return null;
-    }
+    }*/
 }
