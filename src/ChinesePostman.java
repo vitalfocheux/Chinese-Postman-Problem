@@ -51,6 +51,38 @@ public class ChinesePostman {
         return graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2;
     }
 
+    public List<Node> euler2(UndirectedGraph g, Node x){
+        List<Node> trail = new ArrayList<>();
+        trail.add(x);
+        List<Edge> edges = g.getIncidentEdges(x);
+        System.out.println(edges+"righfelkufvelksufgmeisug");
+        if(edges.isEmpty()){
+            System.out.println("blue");
+            System.out.println(trail);
+            return trail;
+        }
+        System.out.println("blued");
+        while(!edges.isEmpty()){
+            System.out.println("blur");
+            Edge e = edges.get(0);
+            Node y = e.from();
+            System.out.println(g.removeEdge(e));
+            x = y;
+            trail.add(x);
+        }
+        System.out.println("bluedd");
+        List<Node> trail_prime = new ArrayList<>();
+        for(int i = 1; i < trail.size(); ++i){
+            trail_prime.addAll(euler2(g, trail.get(i)));
+        }
+        System.out.println(trail_prime);
+        return trail_prime;
+    }
+
+    public List<Node> euler2(Node start){
+        return euler2(graph.copy(), start);
+    }
+
 //    public List<Node> euler2(Node x){
 //        List<Node> trail = new ArrayList<>();
 //        trail.add(x);
@@ -58,30 +90,9 @@ public class ChinesePostman {
 //        if(edges.isEmpty()){
 //            return trail;
 //        }
-//        while(!edges.isEmpty()){
-//            Edge e = edges.get(0);
-//            Node y = e.from();
-//            edges.remove(e);
-//            x = y;
-//            trail.add(x);
-//        }
 //        List<Node> trail_prime = new ArrayList<>();
-//        for(int i = 1; i < trail.size(); ++i){
-//            trail_prime.addAll(euler2(trail.get(i)));
-//        }
 //        return trail_prime;
 //    }
-
-    public List<Node> euler2(Node x){
-        List<Node> trail = new ArrayList<>();
-        trail.add(x);
-        List<Edge> edges = graph.getOutEdges(x);
-        if(edges.isEmpty()){
-            return trail;
-        }
-        List<Node> trail_prime = new ArrayList<>();
-        return trail_prime;
-    }
 
     /**
      * Floyd-Warshall algorithm

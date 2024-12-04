@@ -1,462 +1,329 @@
 package m1graphs2024;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Represents an undirected graph.
+ * Represents an undirected graph data structure, supporting multigraphs (multiple edges between nodes)
+ * and self-loops. This class provides functionality for adding, removing, and accessing nodes and edges,
+ * as well as methods for graph traversal, transformation, and representation.
+ * This class extends the class Graph.
+ * @author Johan Barçon
  */
 public class UndirectedGraph extends Graph{
 
     /**
-     * Constructs an empty undirected graph.
+     * Default constructor that creates an empty graph.
      */
-    public UndirectedGraph(){
+    public UndirectedGraph() {
         super();
     }
 
     /**
-     * Constructs an undirected graph with the specified nodes
-     * @param nodes the nodes of the undirected graph
+     * Constructor that creates an empty graph with a specified name.
+     * @param name the name of the graph
      */
-    public UndirectedGraph(int... nodes){
-        adjEdList = new HashMap<>();
-        int i = 1;
-        for(int n : nodes){
-            if(n == 0){
-                if(!adjEdList.containsKey(new Node(i, this))) {
-                    adjEdList.put(new Node(i, this), new ArrayList<>());
-                }
-                i++;
-            }else{
-                if(!adjEdList.containsKey(new Node(i, this))){
-                    adjEdList.put(new Node(i, this), new ArrayList<>());
-                }
-                if(!adjEdList.containsKey(new Node(n, this))){
-                    adjEdList.put(new Node(n, this), new ArrayList<>());
-                }
-                adjEdList.get(new Node(i, this)).add(new Edge(new Node(i, this), new Node(n, this), this, null));
-            }
-        }
-
+    public UndirectedGraph(String name) {
+        super(name);
     }
 
     /**
-     * Returns all nodes in the graph.
-     * @return a list of all nodes in the graph
+     * Constructor that creates a graph based on an array of node integers.
+     * Each integer represents a node ID, with `0` indicating separation between nodes.
+     * @param nodes array of integers representing the graph's structure
      */
-    public List<Node> getAllNodes(){
-        List<Node> nodes = new ArrayList<>();
-        adjEdList.keySet().forEach(node -> {
-            if(usesNode(node)){
-                nodes.add(node);
-            }
-        });
-        return nodes;
+    public UndirectedGraph(int... nodes) {
+        super(nodes);
     }
 
-    /**
-     * Returns the successors of the specified node
-     * @param n the node whose successors are to be returned
-     * @return the list of successors node
-     */
-    public List<Node> getSuccessors(Node n){
-        if(!holdsNode(n)){
-            return new ArrayList<>();
-        }
-        List<Node> successors = new ArrayList<>();
-        List<Edge> edges = getAllEdges();
-        for(Edge e : edges){
-            if(e.from().equals(n) && !successors.contains(e.to())){
-                successors.add(e.to());
-            }else if(e.to().equals(n) && !successors.contains(e.from())){
-                successors.add(e.from());
+    @Override
+    public void addEdge(Node from, Node to) {
+        super.addEdge(from, to);
+        super.addEdge(to, from);
+    }
+
+    @Override
+    public void addEdge(Node from, Node to, int weight) {
+        super.addEdge(from, to, weight);
+        super.addEdge(to, from, weight);
+    }
+
+    @Override
+    public void addEdge(int fromId, int toId) {
+        super.addEdge(fromId, toId);
+        super.addEdge(toId, fromId);
+    }
+
+    @Override
+    public void addEdge(int fromId, int toId, int weight) {
+        super.addEdge(fromId, toId, weight);
+        super.addEdge(toId, fromId, weight);
+    }
+
+    @Override
+    public int nbEdges() {
+        return super.nbEdges()/2;
+    }
+
+    @Override
+    public void addEdge(Edge e) {
+        super.addEdge(e);
+    }
+
+    @Override
+    public boolean removeEdge(Node from, Node to) { return super.removeEdge(from, to) && super.removeEdge(to, from);}
+
+    @Override
+    public boolean removeEdge(Node from, Node to, int weight) { return super.removeEdge(from, to, weight) && super.removeEdge(to, from, weight);}
+
+    @Override
+    public boolean removeEdge(int fromId, int toId) { return super.removeEdge(getNode(fromId), getNode(toId)) && super.removeEdge(getNode(toId), getNode(fromId));}
+
+    @Override
+    public boolean removeEdge(int fromId, int toId, int weight) { return super.removeEdge(getNode(fromId), getNode(toId), weight) && super.removeEdge(getNode(toId), getNode(fromId), weight);}
+
+    @Override
+    public boolean removeEdge(Edge e) { return super.removeEdge(e) && super.removeEdge(e.to(), e.from()); }
+
+
+    @Override
+    public List<Edge> getOutEdges(int nId) {
+        List<Edge> out = super.getOutEdges(nId);
+        List<Edge> res = new ArrayList<>();
+        boolean oneOnTwo = true;
+        for (Edge e : out) {
+            if (e.from().equals(e.to())){
+                if (oneOnTwo){
+                    res.add(e);
+                }
+                oneOnTwo = !oneOnTwo;
+            }else {
+                res.add(e);
             }
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<Edge> getInEdges(int nId) {
+        return super.getOutEdges(nId);
+    }
+
+    @Override
+    public List<Edge> getInEdges(Node n) {
+        return super.getOutEdges(n);
+    }
+
+    @Override
+    public List<Edge> getIncidentEdges(Node n) {
+        return super.getOutEdges(n);
+    }
+
+    @Override
+    public List<Edge> getIncidentEdges(int nId) {
+        return super.getOutEdges(nId);
+    }
+
+    @Override
+    public List<Node> getSuccessorsMulti(Node n) {
+        List<Edge> edges = getOutEdges(n);
+        List<Node> successors = new ArrayList<Node>();
+        boolean oneOnTwo = true;
+        for (Edge e : edges) {
+            if (e.isSelfLoop()){
+
+                if (oneOnTwo) successors.add(e.to());
+                oneOnTwo = !oneOnTwo;
+            }
+            else successors.add(e.to());
         }
         return successors;
     }
 
-    /**
-     * Returns the successors of the node with the specified ID
-     * @param id the ID of the node whose successors are to be returned
-     * @return the list of successors node
-     */
-    public List<Node> getSuccessors(int id){
-        return getSuccessors(new Node(id, this));
-    }
-
-    /**
-     * Returns the successors of the specified node in a undirected multigraph
-     * @param n the node whose successors are to be returned
-     * @return the list of successors node in an undirected multigraph
-     */
-    public List<Node> getSuccessorsMulti(Node n){
-        if(!holdsNode(n)){
-            return new ArrayList<>();
-        }
-        List<Node> successors = new ArrayList<>();
-        List<Edge> edges = getAllEdges();
-        for(Edge e : edges){
-            if(e.from().equals(n)){
-                successors.add(e.to());
-            }else if(e.to().equals(n)){
-                successors.add(e.from());
-            }
-        }
-        return successors;
-    }
-
-    /**
-     * Returns the successors of the node with the specified ID in a undirected multigraph
-     * @param id the ID of the node whose successors are to be returned
-     * @return the list of successors node in an undirected multigraph
-     */
-    public List<Node> getSuccesorsMulti(int id){
-        return getSuccessorsMulti(new Node(id, this));
-    }
-
-    /**
-     * Returns the degree of the specified node
-     * @param n the node whose degree is to be returned
-     * @return the degree of the node
-     */
-    public int degree(Node n){
-        return super.inDegree(n) + super.outDegree(n);
-    }
-
-    /**
-     * Returns the degree of the node with the specified ID
-     * @param id the ID of the node whose degree is to be returned
-     * @return the degree of the node
-     */
-    public int degree(int id){
-        return degree(new Node(id, this));
-    }
-
-    /**
-     * Returns the out-degree of the specified node
-     * @param n the node whose out-degree is to be returned
-     * @return the out-degree of the node
-     */
-    public int outDegree(Node n){
-        return degree(n);
-    }
-
-    /**
-     * Returns the out-degree of the node with the specified ID
-     * @param id the ID of the node whose out-degree is to be returned
-     * @return the out-degree of the node
-     */
-    public int outDegree(int id){
-        return degree(new Node(id, this));
-    }
-
-    /**
-     * Returns the in-degree of the specified node
-     * @param n the node whose in-degree is to be returned
-     * @return the in-degree of the node
-     */
-    public int inDegree(Node n){
-        return degree(n);
-    }
-
-    /**
-     * Returns the in-degree of the node with the specified ID
-     * @param id the ID of the node whose in-degree is to be returned
-     * @return the in-degree of the node
-     */
-    public int inDegree(int id){
-        return degree(new Node(id, this));
-    }
-
-    /**
-     * Returns the outgoing edges of the specified node
-     * @param n the node whose outgoing edges are to be returned
-     * @return the list of outgoing edges
-     */
-    public List<Edge> getOutEdges(Node n){
-        List<Edge> outEdges = new ArrayList<>();
-        List<Edge> edges = getAllEdges();
-        for(Edge e : edges){
-            if(e.from().equals(n)){
-                outEdges.add(e);
-            }else if(e.to().equals(n)){
-                outEdges.add(new Edge(e.to(), e.from(), this, e.getWeight()));
-            }
-        }
-        return outEdges;
-    }
-
-    /**
-     * Returns the outgoing edges of the node with the specified ID
-     * @param id the ID of the node whose outgoing edges are to be returned
-     * @return the list of outgoing edges
-     */
-    public List<Edge> getOutEdges(int id){
-        return getOutEdges(new Node(id, this));
-    }
-
-    /**
-     * Returns the incoming edges of the specified node
-     * @param n the node whose incoming edges are to be returned
-     * @return the list of incoming edges
-     */
-    public List<Edge> getInEdges(Node n){
-        return getOutEdges(n);
-    }
-
-    /**
-     * Returns the incoming edges of the node with the specified ID
-     * @param id the ID of the node whose incoming edges are to be returned
-     * @return the list of incoming edges
-     */
-    public List<Edge> getInEdges(int id){
-        return getOutEdges(new Node(id, this));
-    }
-
-    /**
-     * Returns the incident edges of the specified node
-     * @param n the node whose incident edges are to be returned
-     * @return the list of incident edges
-     */
-    public List<Edge> getIncidentEdges(Node n){
-        return getOutEdges(n);
-    }
-
-    /**
-     * Returns the incident edges of the node with the specified ID
-     * @param id the ID of the node whose incident edges are to be returned
-     * @return the list of incident edges
-     */
-    public List<Edge> getIncidentEdges(int id){
-        return getOutEdges(new Node(id, this));
-    }
-
-    /**
-     * Returns the edge between the specified nodes
-     * @param u the first node
-     * @param v the second node
-     * @return the list of edges between the two nodes
-     */
-    public List<Edge> getEdges(Node u, Node v){
-        if(!holdsNode(u) || !holdsNode(v)){
-            return new ArrayList<>();
-        }
+    @Override
+    public List<Edge> getAllEdges() {
         List<Edge> edges = new ArrayList<>();
-        adjEdList.get(u).forEach(e -> {
-            if(e.to().equals(v)){
-                edges.add(e);
-            }
-        });
-        return edges;
-    }
-
-    /**
-     * Returns the edge between the nodes with the specified IDs
-     * @param u the ID of the first node
-     * @param v the ID of the second node
-     * @return the list of edges between the two nodes
-     */
-    public List<Edge> getEdges(int u, int v){
-        return getEdges(new Node(u, this), new Node(v, this));
-    }
-
-    /**
-     * Returns the adjacency matrix of the graph
-     * @return the adjacency matrix of the graph
-     */
-    public int[][] toAdjMatrix(){
-        int[][] adjMatrix = new int[nbNodes()][nbNodes()];
-        for(Node n : adjEdList.keySet()){
-            for(Edge e : adjEdList.get(n)){
-                adjMatrix[e.from().getId() - 1][e.to().getId() - 1] += 1;
-                Edge sym = e.getSymmetric();
-                if(!existsEdge(sym)){
-                    adjMatrix[sym.from().getId() - 1][sym.to().getId() - 1] += 1;
+        List<Edge> res = new ArrayList<>();
+        boolean oneOnTwo = true;
+        for (Node n : getAllNodes()){
+            for (Edge e : getAdjEgList().get(n)){
+                if (!edges.contains(e)){
+                    if (e.isSelfLoop()){
+                        if (oneOnTwo) {
+                            res.add(e);
+                        }
+                        oneOnTwo = !oneOnTwo;
+                    }else res.add(e);
                 }
+
+                if (!e.isSelfLoop())edges.add(e.getSymmetric());
             }
+            oneOnTwo = true;
         }
-        return adjMatrix;
+        return res;
     }
 
-    /**
-     * Returns the reverse of the graph
-     * @return the reverse of the graph
-     */
-    public UndirectedGraph getReverse(){
+    @Override
+    public int[][] toAdjMatrix() {
+        int countNodes = nbNodes();
+        int line = 0;
+        int column = 0;
+        int [][] matrix = new int[countNodes][countNodes];
+        for (Edge e: getAllEdges()) {
+            matrix[e.from().getId() - 1][e.to().getId() - 1]++;
+            if (!e.isSelfLoop()) matrix[e.to().getId() - 1][e.from().getId() - 1]++;
+        }
+        return matrix;
+    }
+
+    @Override
+    public UndirectedGraph getReverse() {
         return copy();
     }
 
-    /**
-     * Returns the transitive closure of the graph
-     * @return the transitive closure of the graph
-     */
-    public UndirectedGraph getTransitiveClosure(){
-        UndirectedGraph transitiveClosure = new UndirectedGraph();
-        for(Node n : adjEdList.keySet()){
-            transitiveClosure.addNode(n);
-            List<Node> reachable = getReachable(n, new ArrayList<>());
-            reachable.remove(0);
-            for(Node r : reachable){
-                if(!transitiveClosure.existsEdge(n, r) && !transitiveClosure.existsEdge(r, n)){
-                    transitiveClosure.addEdge(n, r);
-                }
-            }
-        }
-        return transitiveClosure;
-    }
-
-    /**
-     * Returns the reachable nodes from the specified node
-     * @param n the node from which the reachable nodes are to be returned
-     * @param reachable the list of reachable nodes
-     * @return the list of reachable nodes
-     */
-    private List<Node> getReachable(Node n, List<Node> reachable){
-        if(!reachable.contains(n)){
-            reachable.add(n);
-            for(Node s : getSuccessors(n)){
-                getReachable(s, reachable);
-            }
-        }
-        return reachable;
-
-    }
-
-    /**
-     * Returns a simple graph without multi-edges and self-loops
-     * @return a simple graph
-     */
-    public UndirectedGraph toSimpleGraph(){
-        if(!isMultiGraph() && !hasSelfLoops()){
-            return this;
-        }
+    @Override
+    public UndirectedGraph toSimpleGraph() {
         UndirectedGraph simple = new UndirectedGraph();
-        for(Node n : adjEdList.keySet()){
+        Edge newEdge;
+        for (Node n : getAllNodes()){
             simple.addNode(n);
-            for(Edge e : adjEdList.get(n)){
-                if(!simple.existsEdge(e.from(), e.to())){
-                    simple.addEdge(e);
-                }
-            }
+        }
+        for (Edge e: getAllEdges()) {
+            newEdge = new Edge(e.from().getId(), e.to().getId(), e.getWeight(), simple);
+            if (newEdge.isSelfLoop() || (simple.existsEdge(newEdge) && simple.existsEdge(newEdge.getSymmetric()))) continue;
+            simple.addEdge(newEdge);
         }
         return simple;
     }
 
-    /**
-     * Returns a copy of the graph
-     * @return a copy of the graph
-     */
-    public UndirectedGraph copy(){
-        UndirectedGraph copy = new UndirectedGraph();
-        for(Node n : adjEdList.keySet()){
-            copy.addNode(n);
-            for(Edge e : adjEdList.get(n)){
-                copy.addEdge(e);
+    @Override
+    public UndirectedGraph getTransitiveClosure() {
+        UndirectedGraph trans = copy().toSimpleGraph();
+        Edge newEdge;
+        List<Node> descendents;
+        for (Node n: trans.getAllNodes()) {
+            descendents = getDescendents(n);
+            for (Node descendent : descendents) {
+                newEdge = new Edge(n.getId(), descendent.getId(), trans);
+                if (!newEdge.isSelfLoop() && !trans.existsEdge(newEdge) && !trans.existsEdge(newEdge.getSymmetric())) {
+                    trans.addEdge(newEdge);
+                }
             }
+        }
+        return trans;
+    }
+
+
+    @Override
+    public UndirectedGraph copy() {
+        UndirectedGraph copy = new UndirectedGraph();
+        for (Node n: getAllNodes()) {
+            copy.addNode(new Node(copy, n.getId(), n.getName()));
+        }
+        for (Edge e: getAllEdges()) {
+            copy.addEdge(new Edge(e.from().getId(), e.to().getId(), e.getWeight(), copy));
         }
         return copy;
     }
 
-    /**
-     * Creates an undirected graph from a DOT file
-     * @param filename the name of the DOT file
-     * @return the undirected graph created from the DOT file
-     */
-    public static UndirectedGraph fromDotFile(String filename){
-        return fromDotFile(filename, "gv");
-    }
 
     /**
-     * Creates an undirected graph from a DOT file with the specified extension
-     * @param filename the name of the DOT file
-     * @param extension the extension of the DOT file
-     * @return the undirected graph created from the DOT file
+     * Loads an undirected graph from a DOT file with the default .gv extension.
+     * @param filename the name of the file (without extension) to load
+     * @return a Graph instance created from the file, or null if the file cannot be read
      */
-    public static UndirectedGraph fromDotFile(String filename, String extension){
+    public static UndirectedGraph fromDotFile(String filename) { return fromDotFile(filename, ".gv");}
 
-        UndirectedGraph g = new UndirectedGraph();
 
-        Path startPath = Paths.get(System.getProperty("user.dir"));
-        String pattern = filename+"."+extension;
-        final String[] src = {""};
-
+    /**
+     * Loads an undirected graph from a DOT file with the specified extension (.gv or .dot).
+     * @param filename the name of the file (without extension) to load
+     * @param extension the file extension (.gv or .dot)
+     * @return a Graph instance created from the file, or null if the file cannot be read
+     */
+    public static UndirectedGraph fromDotFile(String filename, String extension) {
+        UndirectedGraph graph = null;
+        if (!(extension.equals(".gv")) && !(extension.equals(".dot"))) return graph;
+        File file = new File("./ressources/" + filename + extension);
         try {
-            Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (file.getFileName().toString().equals(pattern)) {
-                        if(!file.toAbsolutePath().toString().contains("out")){
-                            src[0] = file.toAbsolutePath().toString();
+            Scanner reader = new Scanner(file);
+            while (reader.hasNextLine()) {
+                String line = reader.nextLine().trim();
+                if (line.charAt(0) == '#' || line.trim().isEmpty()) continue;
+                String[] tokens = line.split("\\s+");
+                if (line.contains("{")){
+                    if (tokens.length == 3) {
+                        if (Objects.equals(tokens[2], "{")) {
+                            if (tokens[0].equals("graph")) {
+                                graph = new UndirectedGraph(tokens[1]);
+                            } else {
+                                return null;
+                            }
+                        }
+                    }else{
+                        if (tokens[0].equals("graph")) {
+                            graph = new UndirectedGraph();
+                        } else {
+                            return null;
                         }
                     }
-                    return FileVisitResult.CONTINUE;
                 }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try(BufferedReader br = new BufferedReader(new FileReader(src[0]))){
-            String line;
-            while((line = br.readLine()) != null){
-                if(line.contains("--")){
-                    Integer weight = null;
-                    String[] nodes = line.split("--");
-                    Node from = new Node(Integer.parseInt(nodes[0].trim()), g);
-                    if(nodes[1].contains("[")){
-
-                        List<String> sp = List.of(nodes[1].split("\\["));
-                        Pattern pattern_ = Pattern.compile("\\d+");
-                        Matcher matcher = pattern_.matcher(sp.get(1));
-                        if(matcher.find()){
-                            weight = Integer.parseInt(matcher.group().trim());
+                if (tokens[tokens.length - 1].equals("}")) {
+                    return graph;
+                }
+                if (graph != null){
+                    if (tokens.length >= 3) {
+                        if (tokens[1].equals("--")) {
+                            int nodeId1 = Integer.parseInt(tokens[0]);
+                            int nodeId2 = Integer.parseInt(tokens[2]);
+                            if (tokens.length > 3) {
+                                graph.addEdge(nodeId1, nodeId2, Integer.parseInt(tokens[tokens.length - 1].split("=")[1].replace("]", "")));
+                            } else {
+                                graph.addEdge(nodeId1, nodeId2);
+                            }
                         }
-                        nodes[1] = nodes[1].substring(0, nodes[1].indexOf("["));
-                    }
-                    Node to = new Node(Integer.parseInt(nodes[1].trim()), g);
-
-                    if(!g.adjEdList.containsKey(from)){
-                        g.adjEdList.put(from, new ArrayList<>());
-                    }
-
-                    Edge e = new Edge(from, to, g, weight);
-                    g.addEdge(e);
-                }else if(!line.contains("graph") && !line.contains("rankdir") && !line.contains("}")){
-                    g.adjEdList.put(new Node(Integer.parseInt(line.trim()), g), new ArrayList<>());
+                    }else if (tokens.length == 1 && tokens[0].matches("[0-9]+")) graph.addNode(Integer.parseInt(tokens[0]));
                 }
             }
-        }catch (IOException e){
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        return g;
+        return graph;
     }
 
-    /**
-     * Returns the DOT representation of the graph
-     * @return the DOT representation of the graph
-     */
-    public String toDotString(){
-        String res = "graph {\n\trankdir=LR\n";
-        for(Node n : adjEdList.keySet()){
-            if(adjEdList.get(n).isEmpty() && !holdsNode(n)){
-                res += "\t"+n.getId()+"\n";
+    @Override
+    public String toDotString() {
+        StringBuilder res = new StringBuilder("# DOT string generated by the 'toDotString' function\n");
+        res.append("graph ").append(getName()).append("{\n\trankdir=LR");
+        List<Node> edgeNodes = getEdgesNodes(getAllEdges());
+        List<Edge> edges = new ArrayList<>();
+        List<Edge> edges1;
+        boolean oneOnTwo = true;
+
+        for (Node n : getAllNodes()){
+            if (!edgeNodes.contains(n)){
+                res.append("\n\t").append(n.getId());
+                continue;
             }
-            for(Edge e : adjEdList.get(n)){
-                res += "\t"+n.getId()+" -- "+e.to().getId();
-                if(e.isWeighted()){
-                    res += " [label="+e.getWeight()+", len="+e.getWeight()+"]";
+            edges1 = getAdjEgList().get(n);
+            Collections.sort(edges1);
+            for (Edge e : edges1){
+                if (!edges.contains(e)){
+                    if (e.isSelfLoop()){
+                        if (oneOnTwo) {
+                            res.append("\n\t").append(e.toString());
+                        }
+                        oneOnTwo = !oneOnTwo;
+                    }else res.append("\n\t").append(e.toString());
                 }
-                res += "\n";
+
+                if (!e.isSelfLoop())edges.add(e.getSymmetric());
             }
+            oneOnTwo = true;
         }
-        res += "}\n";
-        return res;
+        return res.append("\n}").toString();
     }
+
 }

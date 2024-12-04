@@ -1,86 +1,130 @@
 package m1graphs2024;
 
+import java.util.Objects;
+
 /**
- * Represents the visit information of a node during graph traversal
+ * Represents the visitation information of a node during graph traversal, such as DFS or BFS.
+ * Tracks the node's color state, discovery and finish times, and predecessor node.
+ * @author Johan Barçon
  */
 public class NodeVisitInfo {
-
-    private Node predeccessor;
-    private NodeColour colour;
-    private int discovery, finished;
+    private NodeColour color;
+    private Node predecessor;
+    private Integer discovery;
+    private Integer finished;
 
     /**
-     * Constructs a NodeVisitInfo object with default values
-     * The predecessor is set to null, the colour to white, the discovery time to 0 and the finished time to -1
+     * Constructs a NodeVisitInfo object with a specified color, predecessor, and discovery time.
+     * The finish time is initially set to null.
+     *
+     * @param color       the color representing the visitation state of the node
+     * @param predecessor the predecessor node in the traversal
+     * @param discovery   the discovery time of the node during traversal
+     */
+    public NodeVisitInfo(NodeColour color, Node predecessor, Integer discovery) {
+        this.color = color;
+        this.predecessor = predecessor;
+        this.discovery = discovery;
+        this.finished = null;
+    }
+
+    /**
+     * Constructs a NodeVisitInfo object with default values:
+     * - color is set to WHITE (unvisited)
+     * - predecessor is set to null
+     * - discovery and finish times are set to null
      */
     public NodeVisitInfo() {
-        this.predeccessor = null;
-        this.colour = NodeColour.WHITE;
-        this.discovery = 0;
-        this.finished = -1;
+        this.color = NodeColour.WHITE;
+        this.predecessor = null;
+        this.discovery = null;
+        this.finished = null;
     }
 
     /**
-     * Returns the predecessor of this node
-     * @return the predecessor of this node
+     * Returns the color representing the visitation state of the node.
+     *
+     * @return the color of the node
      */
-    public Node getPredeccessor() {
-        return predeccessor;
+    public NodeColour getColor() {
+        return color;
     }
 
     /**
-     * Returns the discovery time of this node
-     * @return the discovery time of this node
+     * Sets the color representing the visitation state of the node.
+     *
+     * @param color the color to set for the node
      */
-    public int getDiscovery() {
+    public void setColor(NodeColour color) {
+        this.color = color;
+    }
+
+    /**
+     * Returns the predecessor node in the traversal, if any.
+     *
+     * @return the predecessor node, or null if there is no predecessor
+     */
+    public Node getPredecessor() {
+        return predecessor;
+    }
+
+    /**
+     * Sets the predecessor node in the traversal.
+     *
+     * @param predecessor the node to set as predecessor
+     */
+    public void setPredecessor(Node predecessor) {
+        this.predecessor = predecessor;
+    }
+
+    /**
+     * Returns the discovery time of the node during traversal.
+     *
+     * @return the discovery time of the node, or null if not yet discovered
+     */
+    public Integer getDiscovery() {
         return discovery;
     }
 
     /**
-     * Returns the finished time of this node
-     * @return the finished time of this node
+     * Sets the discovery time of the node during traversal.
+     *
+     * @param discovery the discovery time to set
      */
-    public int getFinished() {
-        return finished;
-    }
-
-    /**
-     * Returns the colour of this node
-     * @return the colour of this node
-     */
-    public NodeColour getColour() {
-        return colour;
-    }
-
-    /**
-     * Sets the colour of this node
-     * @param colour the new colour of this node
-     */
-    public void setColour(NodeColour colour){
-        this.colour = colour;
-    }
-
-    /**
-     * Sets the predecessor of this node
-     * @param predeccessor the new predecessor of this node
-     */
-    public void setPredeccessor(Node predeccessor){
-        this.predeccessor = predeccessor;
-    }
-
-    /**
-     * Sets the discovery time of this node
-     * @param discovery the new discovery time of this node
-     */
-    public void setDiscovery(int discovery){
+    public void setDiscovery(Integer discovery) {
         this.discovery = discovery;
     }
 
     /**
-     * Sets the finished time of this node
-     * @param finished the new finished time of this node
+     * Returns the finish time of the node during traversal.
+     *
+     * @return the finish time of the node, or null if not yet finished
      */
-    public void setFinished(int finished){
+    public Integer getFinished() {
+        return finished;
+    }
+
+    /**
+     * Sets the finish time of the node during traversal.
+     *
+     * @param finished the finish time to set
+     */
+    public void setFinished(Integer finished) {
         this.finished = finished;
+    }
+
+    /**
+     * Returns a string representation of the NodeVisitInfo object, including color, predecessor, discovery, and finish times.
+     *
+     * @return a string representation of the visitation information
+     */
+    @Override
+    public String toString() {
+        return "{" +
+                "color=" + color +
+                ", predecessor=" + predecessor +
+                ", discovery=" + discovery +
+                ", finished=" + finished +
+                "}";
     }
 }
