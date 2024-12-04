@@ -1,15 +1,20 @@
+import m1graphs2024.Node;
+import m1graphs2024.UndirectedGraph;
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        UndirectedGraph g = UndirectedGraph.fromDotFile("eulerian");
+        ChinesePostman c = new ChinesePostman(g);
+        System.out.println(c.euler2(new Node(g.smallestNodeId(), g)));
+//        System.out.println(c.floydWarshall());
+//
+//
+//        System.out.println("Eulerian: "+c.isEulerian());
+//        System.out.println("Semi-Eulerian: "+c.isSemiEulerian());
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        //System.out.println(c.euler2(g, new Node(g.smallestNodeId(), g)));
+
     }
 }

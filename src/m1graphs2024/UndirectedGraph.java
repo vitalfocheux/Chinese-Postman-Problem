@@ -412,10 +412,11 @@ public class UndirectedGraph extends Graph{
                     Node from = new Node(Integer.parseInt(nodes[0].trim()), g);
                     if(nodes[1].contains("[")){
 
-                        Pattern pattern_ = Pattern.compile("label=(\\d+)");
-                        Matcher matcher = pattern_.matcher(nodes[1]);
+                        List<String> sp = List.of(nodes[1].split("\\["));
+                        Pattern pattern_ = Pattern.compile("\\d+");
+                        Matcher matcher = pattern_.matcher(sp.get(1));
                         if(matcher.find()){
-                            weight = Integer.parseInt(matcher.group(1));
+                            weight = Integer.parseInt(matcher.group().trim());
                         }
                         nodes[1] = nodes[1].substring(0, nodes[1].indexOf("["));
                     }

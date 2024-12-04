@@ -6,7 +6,7 @@ import java.util.*;
 
 public class ChinesePostman {
 
-    private final Integer INFINITY = Integer.MIN_VALUE;
+    private final Integer INFINITY = Integer.MAX_VALUE;
 
     UndirectedGraph graph;
 
@@ -15,7 +15,72 @@ public class ChinesePostman {
     }
 
     private Integer weight(Node x, Node y){
-        return graph.getEdges(x, y).get(0).getWeight();
+        List<Edge> edges = graph.getEdges(x, y);
+        if(edges.isEmpty()){
+            return null;
+        }
+        return edges.get(0).getWeight();
+    }
+
+    public void solve(){
+        List<Node> nodes = graph.getAllNodes();
+        if(graph.getDFS().size() == nodes.size()){
+            if(nodes.stream().allMatch(node -> graph.degree(node) % 2 == 0)){
+                System.out.println("The graph is Eulerian");
+            }else if(nodes.stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2) {
+                System.out.println("The graph is semi-Eulerian");
+            }
+        }
+    }
+
+    private boolean isConnected(){
+        return graph.getDFS().size() == graph.getAllNodes().size();
+    }
+
+    public boolean isEulerian(){
+        if(!isConnected()){
+            return false;
+        }
+        return graph.getAllNodes().stream().allMatch(node -> graph.degree(node) % 2 == 0);
+    }
+
+    public boolean isSemiEulerian(){
+        if(!isConnected()){
+            return false;
+        }
+        return graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2;
+    }
+
+//    public List<Node> euler2(Node x){
+//        List<Node> trail = new ArrayList<>();
+//        trail.add(x);
+//        List<Edge> edges = graph.getOutEdges(x);
+//        if(edges.isEmpty()){
+//            return trail;
+//        }
+//        while(!edges.isEmpty()){
+//            Edge e = edges.get(0);
+//            Node y = e.from();
+//            edges.remove(e);
+//            x = y;
+//            trail.add(x);
+//        }
+//        List<Node> trail_prime = new ArrayList<>();
+//        for(int i = 1; i < trail.size(); ++i){
+//            trail_prime.addAll(euler2(trail.get(i)));
+//        }
+//        return trail_prime;
+//    }
+
+    public List<Node> euler2(Node x){
+        List<Node> trail = new ArrayList<>();
+        trail.add(x);
+        List<Edge> edges = graph.getOutEdges(x);
+        if(edges.isEmpty()){
+            return trail;
+        }
+        List<Node> trail_prime = new ArrayList<>();
+        return trail_prime;
     }
 
     /**
@@ -28,29 +93,37 @@ public class ChinesePostman {
         Map<Pair<Node, Node>, Pair<Integer, Node>> res = new HashMap<>();
         for(Node x : nodes){
             for(Node y : nodes){
+                Pair<Node, Node> pair = new Pair<>(x, y);
+                List<Edge> edges = graph.getEdges(x, y);
                 if(x.equals(y)){
-                    res.put(new Pair<>(x, y), new Pair<>(0, x));
-                }else{
-                    if(graph.existsEdge(x, y)) {
-                        res.put(new Pair<>(x, y), new Pair<>(weight(x, y), x));
-                    }else{
-                        res.put(new Pair<>(x, y), new Pair<>(INFINITY, null));
+                    res.put(pair, new Pair<>(0, x));
+                }else if(!edges.isEmpty()){
+                    int weight = INFINITY;
+                    for(Edge edge : edges){
+                        if(edge.getWeight() < weight){
+                            weight = edge.getWeight();
+                        }
                     }
+                    res.put(pair, new Pair<>(weight, y));
+                }else{
+                    res.put(pair, new Pair<>(INFINITY, null));
                 }
             }
         }
-
+        System.err.println(res.get(new Pair<>(new Node(1, graph), new Node(1, graph))));
         for(Node z : nodes){
             for(Node x : nodes){
                 for(Node y : nodes){
-                    //Pair<Node, Node> xz = new Pair<>(x, z);
+                    Pair<Node, Node> xz = new Pair<>(x, z);
                     Pair<Node, Node> zy = new Pair<>(z, y);
                     Pair<Node, Node> xy = new Pair<>(x, y);
-                    Integer Mxz = res.get(new Pair<>(x, z)).getFirst();
+
+                    Integer Mxz = res.get(xz).getFirst();
                     Integer Mzy = res.get(zy).getFirst();
                     Integer Mxy = res.get(xy).getFirst();
+
                     if(!Objects.equals(Mxz, INFINITY) && !Objects.equals(Mzy, INFINITY) && Mxz + Mzy < Mxy){
-                        res.put(xy, new Pair<>(Mxz + Mzy, res.get(zy).getSecond()));
+                        res.put(zy, new Pair<>(res.get(xz).getFirst() + res.get(xy).getFirst(), x));
                     }
                 }
             }
@@ -77,6 +150,30 @@ public class ChinesePostman {
             }
         }
         return listsOfPairs;
+    }
+
+    public List<Edge> computeEulerianCircuit(){
+        return computeEulerianCircuit(graph.getNode(graph.smallestNodeId()));
+    }
+
+    public List<Edge> computeEulerianCircuit(Node start){
+        List<Edge> circuit = new ArrayList<>();
+        Stack<Node> stack = new Stack<>();
+        stack.push(start);
+        while(!stack.isEmpty()){
+            Node curr = stack.peek();
+            List<Edge> edges = graph.getOutEdges(curr);
+            if(!edges.isEmpty()){
+                for(Edge edge : edges){
+                    Node nextNode = edge.to();
+                    stack.push(nextNode);
+                    circuit.add(edge);
+                }
+            }else{
+                stack.pop();
+            }
+        }
+        return circuit;
     }
 
     /*public static ChinesePostman fromDotFile(String filename){

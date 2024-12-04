@@ -578,22 +578,7 @@ graph {
 	5 -- 6 [label=7, len=7]
 	5 -- 6 [label=10, len=10]
 	6 -- 6 [label=5, len=5]
-	6 -- 6 [label=8, len=8]
+	6 -- 6
 }
 
 ---------------------
-The sum of all edges weights equals 117
-
-Comparing single and multi successors per node for uwmg
-1 single successors: [2, 3, 4]
-1 multi  successors: [2, 3, 3, 4]
-2 single successors: [1, 3, 4, 5]
-2 multi  successors: [1, 3, 4, 4, 5]
-3 single successors: [1, 2, 5]
-3 multi  successors: [1, 1, 2, 5]
-4 single successors: [1, 2, 4, 5]
-4 multi  successors: [1, 2, 2, 4, 5]
-5 single successors: [2, 3, 4, 6]
-5 multi  successors: [2, 3, 4, 6, 6]
-6 single successors: [5, 6]
-6 multi  successors: [5, 5, 6, 6]

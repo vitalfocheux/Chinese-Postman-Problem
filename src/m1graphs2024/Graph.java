@@ -435,6 +435,10 @@ public class Graph {
         return existsEdge(new Edge(u, v, this, null));
     }
 
+    public boolean existsEdge(Node u, Node v, Integer weight){
+        return existsEdge(new Edge(u, v, this, weight));
+    }
+
     /**
      * Checks if an edge exists between the nodes with the specified IDs
      * @param u the ID of the first node
