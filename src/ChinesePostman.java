@@ -7,6 +7,7 @@ import java.util.*;
 public class ChinesePostman {
 
     private final Integer INFINITY = Integer.MAX_VALUE;
+    private String type = "";
 
     UndirectedGraph graph;
 
@@ -26,15 +27,16 @@ public class ChinesePostman {
         List<Node> nodes = graph.getAllNodes();
         if(graph.getDFS().size() == nodes.size()){
             if(isEulerian()){
-                System.out.println("Eulerian");
+                type ="Eulerian";
                 return eulerianTrail(new Node(graph, graph.smallestNodeId()));
             }else if(isSemiEulerian()) {
-                System.out.println("Semi-Eulerian");
+                type = "Semi-Eulerian";
                 Node start = graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).findFirst().get();
                 return eulerianTrail(new Node(graph, start.getId()));
             }
         }
-        return new ArrayList<>();
+        type = "Non Eulerian";
+        return chineseCircuit(new Node(graph, graph.smallestNodeId()));
     }
 
     private boolean isConnected(){
@@ -82,6 +84,30 @@ public class ChinesePostman {
         return eulerianTrail(g, g.getNode(start.getId()));
     }
 
+    public List<Node> chineseCircuit(Node start){
+        Map<Pair<Node, Node>, Pair<Integer, Node>> floyd_warshall = floydWarshall();
+        List<Node> oddNodes = new ArrayList<>();
+        graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).forEach(oddNodes::add);
+        Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching = lengthPairwiseMatching(oddNodes);
+        List<Pair<Node, Node>> bestMatching = lengthPairwiseMatching.getFirst();
+        int extraCost = lengthPairwiseMatching.getSecond();
+        for(Pair<Node, Node> pair : bestMatching){
+            Node from = pair.getFirst();
+            Node curr = from;
+            while(!curr.equals(pair.getSecond())){
+                Node next = floyd_warshall.get(new Pair<>(curr, pair.getSecond())).getSecond();
+                Node futur_curr = floyd_warshall.get(new Pair<>(curr, next)).getSecond();
+                Integer weight = floyd_warshall.get(new Pair<>(curr, next)).getFirst();
+                //TODO: faire pour mettre la couleur red
+                graph.addEdge(curr.getId(), futur_curr.getId(), weight);
+                curr = futur_curr;
+            }
+        }
+//        System.out.println(graph.toDotString());
+//        System.out.println("extraCost: "+extraCost);
+        return eulerianTrail(start);
+    }
+
     /**
      * Floyd-Warshall algorithm
      * @return a map with the shortest path between each pair of nodes where the key is a pair of nodes and the value
@@ -98,7 +124,6 @@ public class ChinesePostman {
                 if(x.equals(y)){
                     res.put(pair, new Pair<>(0, x));
                 }else if(!edges.isEmpty()){
-                    System.out.println("edges "+x+" "+y+": "+edges);
                     int weight = INFINITY;
                     for(Edge edge : edges){
                         if(edge.getWeight() < weight){
@@ -107,7 +132,6 @@ public class ChinesePostman {
                     }
                     res.put(pair, new Pair<>(weight, y));
                 }else{
-                    System.out.println("edges "+x+" "+y+": "+edges);
                     res.put(pair, new Pair<>(INFINITY, null));
                 }
             }
@@ -158,7 +182,6 @@ public class ChinesePostman {
         } else {
 
             Node x = v.stream().min(Node::compareTo).get();
-            System.out.println(x);
             v.remove(x);
             Set<Node> setNextNodes = new HashSet<>(v);
             for (Node y : setNextNodes) {

@@ -12,17 +12,18 @@ public class Main {
 
         UndirectedGraph g = UndirectedGraph.fromDotFile("tc1");
         ChinesePostman c = new ChinesePostman(g);
-//        System.out.println("Eulerian Trail: " + c.findEulerianWay());
-//        System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
+        //System.out.println("Eulerian Trail: " + c.findEulerianWay());
+        System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
+        System.out.println(c.chineseCircuit(g.getNode(1)));
 
-        List<Node> v = new ArrayList<>();
-        for(Node n : g.getAllNodes()){
-            if(g.degree(n) % 2 != 0){
-                v.add(n);
-            }
-        }
-        Set<Node> nodes = new HashSet<>(v);
-        System.out.println(c.listPairsOddNodes(nodes, new ArrayList<>(), new ArrayList<>()));
-        System.out.println(c.lengthPairwiseMatching(v));
+//        List<Node> v = new ArrayList<>();
+//        for(Node n : g.getAllNodes()){
+//            if(g.degree(n) % 2 != 0){
+//                v.add(n);
+//            }
+//        }
+//        Set<Node> nodes = new HashSet<>(v);
+//        System.out.println(c.listPairsOddNodes(nodes, new ArrayList<>(), new ArrayList<>()));
+//        System.out.println(c.lengthPairwiseMatching(v));
     }
 }
