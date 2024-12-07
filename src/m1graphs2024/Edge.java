@@ -114,7 +114,7 @@ public class Edge implements Comparable<Edge> {
     public boolean isMultiEdge() {
         Graph curGraph = from.getGraph();
         for (Edge e : curGraph.getOutEdges(from)) {
-            if (!e.equals(this) && e.to().equals(to)) return true;
+            if (e != this && e.to().equals(to)) return true;
         }
         return false;
     }
@@ -211,5 +211,15 @@ public class Edge implements Comparable<Edge> {
     public String toString() {
         return from + ((from.getGraph() instanceof UndirectedGraph) ? " -- " : " -> ") + to +
                 (isWeighted() ? " [label=" + weight + ", len=" + weight + "]" : "");
+    }
+
+    /**
+     * Returns a string representation of this edge, formatted according to graph type
+     * in a circuit and showing the weight if present.
+     *
+     * @return a string representation of this edge
+     */
+    public String toCircuitString() {
+        return from + "-" + (isWeighted() ? "(" + weight + ")" : "") + "-" + to;
     }
 }

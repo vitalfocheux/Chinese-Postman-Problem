@@ -732,11 +732,9 @@ public class Graph {
      * @return true if the graph is a multigraph, false otherwise
      */
     public boolean isMultiGraph() {
-        for (List<Edge> edges: adjEgList.values()) {
-            for (Edge edge : edges) {
-                if (isMultiEdge(edge)){
-                    return true;
-                }
+        for (Edge edge : getAllEdges()) {
+            if (isMultiEdge(edge)){
+                return true;
             }
         }
         return false;
@@ -747,15 +745,29 @@ public class Graph {
      * @return true if the graph is simple, false otherwise
      */
     public boolean isSimpleGraph() {
-        for (List<Edge> edges: adjEgList.values()) {
-            for (Edge edge : edges) {
-                if (isMultiEdge(edge) || edge.isSelfLoop()){
-                    return false;
-                }
+        for (Edge edge : getAllEdges()) {
+            if (isMultiEdge(edge) || edge.isSelfLoop()){
+                return false;
             }
         }
         return true;
     }
+
+    /**
+     * Checks if the graph is disconnected.
+     * /!\ this methode consider a graph with only isolated nodes as connected
+     * @return true if the graph is disconnected, false otherwise
+     */
+    public boolean isDisconnectedGraph() {
+        Set<Node> visited = new HashSet<>(getDescendents(smallestNodeId()));
+        visited.add(getNode(smallestNodeId()));
+        for (Node n : getAllNodes()) {
+            if (!visited.contains(n) && n.getIncidentEdges().size() != 0) return false;
+        }
+        return true;
+    }
+
+
 
     /**
      * Checks if the graph contains any self-loops.
@@ -1046,7 +1058,7 @@ public class Graph {
      * @param filename the name of the file (without extension) to load
      * @return a Graph instance created from the file, or null if the file cannot be read
      */
-    public static Graph fromDotFile(String filename) {
+    public static Graph fromDotFile(String filename) throws FileNotFoundException {
         return fromDotFile(filename, ".gv");
     }
 
@@ -1060,51 +1072,57 @@ public class Graph {
         Graph graph = null;
         if (!(extension.equals(".gv")) && !(extension.equals(".dot"))) return graph;
         File file = new File("./ressources/" + filename + extension);
+        Scanner scanner = null;
         try {
-            Scanner reader = new Scanner(file);
-            while (reader.hasNextLine()) {
-                String line = reader.nextLine().trim();
-                if (line.charAt(0) == '#' || line.trim().isEmpty()) continue;
-                String[] tokens = line.split("\\s+");
-                if (line.contains("{")){
-                    if (tokens.length == 3) {
-                        if (Objects.equals(tokens[2], "{")) {
-                            if (tokens[0].equals("digraph")) {
-                                graph = new Graph(tokens[1]);
-                            } else {
-                                return null;
-                            }
-                        }
-                    }else{
-                        if (tokens[0].equals("digraph")) {
-                            graph = new Graph();
-                        } else {
-                            return null;
-                        }
-                    }
-                }
-                if (tokens[tokens.length - 1].equals("}")) {
-                    return graph;
-                }
-                if (graph != null){
-                    if (tokens.length >= 3) {
-                        if (tokens[1].equals("->")) {
-                            int nodeId1 = Integer.parseInt(tokens[0]);
-                            int nodeId2 = Integer.parseInt(tokens[2]);
-                            graph.addNode(nodeId1);
-                            graph.addNode(nodeId2);
-                            if (tokens.length > 3) {
-                                graph.addEdge(nodeId1, nodeId2, Integer.parseInt(tokens[tokens.length - 1].split("=")[1].replace("]", "")));
-                            } else {
-                                graph.addEdge(nodeId1, nodeId2);
-                            }
-                        }
-                    }else if (tokens.length == 1 && tokens[0].matches("[0-9]+")) graph.addNode(Integer.parseInt(tokens[0]));
-                }
-            }
+            scanner = new Scanner(file);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+        graph = new Graph(); // Initialize an empty graph
+
+        while (scanner.hasNext()) {
+            String token = scanner.next();
+
+            if (token.equals("graph") || token.equals("{") || token.equals("rankdir=LR")) {
+                continue;
+            }else if (token.equals("}")) {
+                break;
+            }
+
+            // Parse nodes and edges
+            try {
+                int from = Integer.parseInt(token); // Read the first node
+                scanner.next(); // Skip the "--"
+                int to = scanner.nextInt(); // Read the second node
+
+                // Check for attributes (label, len)
+                String attributes = scanner.findInLine("\\[.*?\\]");
+                Integer weight = null;
+                if (attributes != null) {
+                    // Parse the "label" attribute if present
+                    String[] parts = attributes.replace("[", "").replace("]", "").split(",");
+                    for (String part : parts) {
+                        String[] keyValue = part.split("=");
+                        if (keyValue[0].trim().equals("label") || keyValue[0].trim().equals("len")) {
+                            weight = Integer.parseInt(keyValue[1].trim());
+                        }
+                    }
+                }
+
+                // Add the nodes and edge to the graph
+                graph.addNode(from);
+                graph.addNode(to);
+                if (weight != null) {
+                    graph.addEdge(from, to, weight);
+                } else {
+                    graph.addEdge(from, to);
+                }
+            } catch (NumberFormatException | IllegalStateException e) {
+                // Handle potential parsing issues
+                System.err.println("Error parsing line: " + token);
+            }
+        }
+        scanner.close();
         return graph;
     }
 

@@ -37,17 +37,6 @@ public class Node implements Comparable<Node> {
     }
 
     /**
-     * Constructs a Node with a specified id and assigns it to a graph.
-     *
-     * @param graph_holder the Graph to which this node belongs
-     * @param id           the unique identifier of this node
-     */
-    public Node(int id, Graph graph_holder) {
-        this.graph_holder = graph_holder;
-        this.id = id;
-    }
-
-    /**
      * Constructs a Node with a specified id and name, and assigns it to a graph.
      *
      * @param graph_holder the Graph to which this node belongs

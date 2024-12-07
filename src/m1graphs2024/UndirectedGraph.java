@@ -88,8 +88,11 @@ public class UndirectedGraph extends Graph{
 
 
     @Override
-    public List<Edge> getOutEdges(int nId) {
-        List<Edge> out = super.getOutEdges(nId);
+    public List<Edge> getOutEdges(int nId) { return getOutEdges(getNode(nId)); }
+
+    @Override
+    public List<Edge> getOutEdges(Node n) {
+        List<Edge> out = super.getIncidentEdges(n);
         List<Edge> res = new ArrayList<>();
         boolean oneOnTwo = true;
         for (Edge e : out) {
@@ -108,17 +111,17 @@ public class UndirectedGraph extends Graph{
 
     @Override
     public List<Edge> getInEdges(int nId) {
-        return super.getOutEdges(nId);
+        return getOutEdges(nId);
     }
 
     @Override
     public List<Edge> getInEdges(Node n) {
-        return super.getOutEdges(n);
+        return getOutEdges(n);
     }
 
     @Override
     public List<Edge> getIncidentEdges(Node n) {
-        return super.getOutEdges(n);
+        return getOutEdges(n);
     }
 
     @Override
@@ -247,51 +250,60 @@ public class UndirectedGraph extends Graph{
         UndirectedGraph graph = null;
         if (!(extension.equals(".gv")) && !(extension.equals(".dot"))) return graph;
         File file = new File("./ressources/" + filename + extension);
+        Scanner scanner = null;
         try {
-            Scanner reader = new Scanner(file);
-            while (reader.hasNextLine()) {
-                String line = reader.nextLine().trim();
-                if (line.charAt(0) == '#' || line.trim().isEmpty()) continue;
-                String[] tokens = line.split("\\s+");
-                if (line.contains("{")){
-                    if (tokens.length == 3) {
-                        if (Objects.equals(tokens[2], "{")) {
-                            if (tokens[0].equals("graph")) {
-                                graph = new UndirectedGraph(tokens[1]);
-                            } else {
-                                return null;
-                            }
-                        }
-                    }else{
-                        if (tokens[0].equals("graph")) {
-                            graph = new UndirectedGraph();
-                        } else {
-                            return null;
-                        }
-                    }
-                }
-                if (tokens[tokens.length - 1].equals("}")) {
-                    return graph;
-                }
-                if (graph != null){
-                    if (tokens.length >= 3) {
-                        if (tokens[1].equals("--")) {
-                            int nodeId1 = Integer.parseInt(tokens[0]);
-                            int nodeId2 = Integer.parseInt(tokens[2]);
-                            if (tokens.length > 3) {
-                                graph.addEdge(nodeId1, nodeId2, Integer.parseInt(tokens[tokens.length - 1].split("=")[1].replace("]", "")));
-                            } else {
-                                graph.addEdge(nodeId1, nodeId2);
-                            }
-                        }
-                    }else if (tokens.length == 1 && tokens[0].matches("[0-9]+")) graph.addNode(Integer.parseInt(tokens[0]));
-                }
-            }
+            scanner = new Scanner(file);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+        graph = new UndirectedGraph(); // Initialize an empty graph
+
+        while (scanner.hasNext()) {
+            String token = scanner.next();
+
+            if (token.equals("graph") || token.equals("{") || token.equals("rankdir=LR")) {
+                continue;
+            }else if (token.equals("}")) {
+                break;
+            }
+
+            // Parse nodes and edges
+            try {
+                int from = Integer.parseInt(token); // Read the first node
+                scanner.next(); // Skip the "--"
+                int to = scanner.nextInt(); // Read the second node
+
+                // Check for attributes (label, len)
+                String attributes = scanner.findInLine("\\[.*?\\]");
+                Integer weight = null;
+                if (attributes != null) {
+                    // Parse the "label" attribute if present
+                    String[] parts = attributes.replace("[", "").replace("]", "").split(",");
+                    for (String part : parts) {
+                        String[] keyValue = part.split("=");
+                        if (keyValue[0].trim().equals("label") || keyValue[0].trim().equals("len")) {
+                            weight = Integer.parseInt(keyValue[1].trim());
+                        }
+                    }
+                }
+
+                // Add the nodes and edge to the graph
+                graph.addNode(from);
+                graph.addNode(to);
+                if (weight != null) {
+                    graph.addEdge(from, to, weight);
+                } else {
+                    graph.addEdge(from, to);
+                }
+            } catch (NumberFormatException | IllegalStateException e) {
+                // Handle potential parsing issues
+                System.err.println("Error parsing line: " + token);
+            }
+        }
+        scanner.close();
         return graph;
     }
+
 
     @Override
     public String toDotString() {

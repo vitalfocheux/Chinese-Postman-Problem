@@ -52,27 +52,32 @@ public class ChinesePostman {
     }
 
     public List<Node> euler2(UndirectedGraph g, Node x){
+        System.out.println("Start with :");
+        System.out.println(g.toDotString());
+        System.out.println(x);
         List<Node> trail = new ArrayList<>();
         trail.add(x);
-        List<Edge> edges = g.getIncidentEdges(x);
-        System.out.println(edges+"righfelkufvelksufgmeisug");
+        List<Edge> edges = g.getOutEdges(x);
         if(edges.isEmpty()){
-            System.out.println("blue");
-            System.out.println(trail);
+            System.out.println(x + " is empty, return " + trail);
             return trail;
         }
-        System.out.println("blued");
         while(!edges.isEmpty()){
-            System.out.println("blur");
+            System.out.println(g.getIncidentEdges(3));
+            System.out.println("  edges now:"+edges);
             Edge e = edges.get(0);
-            Node y = e.from();
-            System.out.println(g.removeEdge(e));
-            x = y;
+            x = e.to();
+            g.removeEdge(e);
+            System.out.println("  edges after:"+edges);
             trail.add(x);
+            edges = g.getOutEdges(x);
+            System.out.println("  new edges now:"+edges);
+            System.out.println("  trail now:"+trail);
+            System.out.println("  y now:"+x.getId());
         }
-        System.out.println("bluedd");
+        System.out.println("TRAIL IN THE END: "+trail);
         List<Node> trail_prime = new ArrayList<>();
-        for(int i = 1; i < trail.size(); ++i){
+        for(int i = 0; i < trail.size(); ++i){
             trail_prime.addAll(euler2(g, trail.get(i)));
         }
         System.out.println(trail_prime);
@@ -80,7 +85,8 @@ public class ChinesePostman {
     }
 
     public List<Node> euler2(Node start){
-        return euler2(graph.copy(), start);
+        UndirectedGraph g = graph.copy();
+        return euler2(g, g.getNode(g.smallestNodeId()));
     }
 
 //    public List<Node> euler2(Node x){
@@ -121,7 +127,7 @@ public class ChinesePostman {
                 }
             }
         }
-        System.err.println(res.get(new Pair<>(new Node(1, graph), new Node(1, graph))));
+        System.err.println(res.get(new Pair<>(new Node(graph, 1), new Node(graph, 1))));
         for(Node z : nodes){
             for(Node x : nodes){
                 for(Node y : nodes){
