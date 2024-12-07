@@ -136,11 +136,12 @@ public class ChinesePostman {
         v.sort(Comparator.comparing(Node::getId));
         List<Pair<Node, Node>> bestMatching = new ArrayList<>();
         Integer bestMatchingWeight = Integer.MAX_VALUE;
+        Map<Pair<Node, Node>, Pair<Integer, Node>> floyd_warshall = floydWarshall();
         List<List<Pair<Node, Node>>> listPairwiseMatching = listPairsOddNodes(new HashSet<>(v), new ArrayList<>(), new ArrayList<>());
         for(List<Pair<Node, Node>> pairs : listPairwiseMatching){
             Integer weight = 0;
             for(Pair<Node, Node> pair : pairs){
-                weight += floydWarshall().get(pair).getFirst();
+                weight += floyd_warshall.get(pair).getFirst();
             }
             if(weight < bestMatchingWeight){
                 bestMatching = pairs;
