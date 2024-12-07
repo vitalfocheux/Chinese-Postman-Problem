@@ -22,15 +22,19 @@ public class ChinesePostman {
         return edges.get(0).getWeight();
     }
 
-    public void solve(){
+    public List<Node> solve(){
         List<Node> nodes = graph.getAllNodes();
         if(graph.getDFS().size() == nodes.size()){
-            if(nodes.stream().allMatch(node -> graph.degree(node) % 2 == 0)){
-                System.out.println("The graph is Eulerian");
-            }else if(nodes.stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2) {
-                System.out.println("The graph is semi-Eulerian");
+            if(isEulerian()){
+                System.out.println("Eulerian");
+                return euler2(new Node(graph, graph.smallestNodeId()));
+            }else if(isSemiEulerian()) {
+                System.out.println("Semi-Eulerian");
+                Node start = graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).findFirst().get();
+                return euler2(new Node(graph, start.getId()));
             }
         }
+        return new ArrayList<>();
     }
 
     private boolean isConnected(){
@@ -38,9 +42,6 @@ public class ChinesePostman {
     }
 
     public boolean isEulerian(){
-        if(!isConnected()){
-            return false;
-        }
         return graph.getAllNodes().stream().allMatch(node -> graph.degree(node) % 2 == 0);
     }
 
@@ -65,9 +66,20 @@ public class ChinesePostman {
         while(!edges.isEmpty()){
             System.out.println(g.getIncidentEdges(3));
             System.out.println("  edges now:"+edges);
+            System.out.println("trail before remove: "+trail);
             Edge e = edges.get(0);
-            x = e.to();
+            if(trail.get(trail.size()-1).equals(e.to())){
+                x = e.from();
+            }else{
+                x = e.to();
+            }
+            if(edges.size() > 1){
+                System.out.println(e.equals(edges.get(1)));
+            }
+
             g.removeEdge(e);
+            System.out.println("edge remove: "+e);
+            System.out.println(g.toDotString());
             System.out.println("  edges after:"+edges);
             trail.add(x);
             edges = g.getOutEdges(x);
@@ -86,19 +98,8 @@ public class ChinesePostman {
 
     public List<Node> euler2(Node start){
         UndirectedGraph g = graph.copy();
-        return euler2(g, g.getNode(g.smallestNodeId()));
+        return euler2(g, start);
     }
-
-//    public List<Node> euler2(Node x){
-//        List<Node> trail = new ArrayList<>();
-//        trail.add(x);
-//        List<Edge> edges = graph.getOutEdges(x);
-//        if(edges.isEmpty()){
-//            return trail;
-//        }
-//        List<Node> trail_prime = new ArrayList<>();
-//        return trail_prime;
-//    }
 
     /**
      * Floyd-Warshall algorithm
