@@ -13,6 +13,7 @@ public class Edge implements Comparable<Edge> {
     private Node from;
     private Node to;
     private Integer weight = null;
+    private String color;
 
     /**
      * Constructs an unweighted edge between two nodes in the same graph.
@@ -68,6 +69,12 @@ public class Edge implements Comparable<Edge> {
     public Edge(int from, int to, Integer weight, Graph graphHolder) {
         this(from, to, graphHolder);
         this.weight = weight;
+    }
+
+    public Edge(int from, int to, Integer weight, Graph graphHolder, String color) {
+        this(from, to, graphHolder);
+        this.weight = weight;
+        this.color = color;
     }
 
     /**
@@ -152,6 +159,10 @@ public class Edge implements Comparable<Edge> {
         return weight;
     }
 
+    public String getColor() {
+        return color;
+    }
+
     /**
      * Compares this edge with another object for equality. Edges are considered equal if they
      * have the same source, destination, and weight (if weighted).
@@ -210,7 +221,8 @@ public class Edge implements Comparable<Edge> {
     @Override
     public String toString() {
         return from + ((from.getGraph() instanceof UndirectedGraph) ? " -- " : " -> ") + to +
-                (isWeighted() ? " [label=" + weight + ", len=" + weight + "]" : "");
+                (isWeighted() ? " [label=" + weight + ", len=" + weight + "]" : "") +
+                (color != null ? " [color=" + color + ", fontcolor="+color+"]" : "");
     }
 
     /**
