@@ -98,6 +98,7 @@ public class ChinesePostman {
                 if(x.equals(y)){
                     res.put(pair, new Pair<>(0, x));
                 }else if(!edges.isEmpty()){
+                    System.out.println("edges "+x+" "+y+": "+edges);
                     int weight = INFINITY;
                     for(Edge edge : edges){
                         if(edge.getWeight() < weight){
@@ -106,6 +107,7 @@ public class ChinesePostman {
                     }
                     res.put(pair, new Pair<>(weight, y));
                 }else{
+                    System.out.println("edges "+x+" "+y+": "+edges);
                     res.put(pair, new Pair<>(INFINITY, null));
                 }
             }
@@ -130,23 +132,45 @@ public class ChinesePostman {
         return res;
     }
 
-    public Pair<Integer, Integer> lengthPairwiseMatching(List<Node> v){
-        return null;
+    public Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching(List<Node> v){
+        v.sort(Comparator.comparing(Node::getId));
+        List<Pair<Node, Node>> bestMatching = new ArrayList<>();
+        Integer bestMatchingWeight = Integer.MAX_VALUE;
+        List<List<Pair<Node, Node>>> listPairwiseMatching = listPairs(new HashSet<>(v), new ArrayList<>(), new ArrayList<>());
+        for(List<Pair<Node, Node>> pairs : listPairwiseMatching){
+            Integer weight = 0;
+            for(Pair<Node, Node> pair : pairs){
+                weight += floydWarshall().get(pair).getFirst();
+            }
+            if(weight < bestMatchingWeight){
+                bestMatching = pairs;
+                bestMatchingWeight = weight;
+            }
+        }
+        return new Pair<>(bestMatching, bestMatchingWeight);
     }
 
-    public List<Pair<Node, Node>> listPairs(Set<Node> v, List<Pair<Node, Node>> currentListsOfPairs, List<Pair<Node, Node>> listsOfPairs){
-        if(v.isEmpty()){
-            listsOfPairs.addAll(currentListsOfPairs);
-        }else{
-            Node x = Collections.min(v);
-            for(Node y : v){
-                if(x.getId() < y.getId()){
-                    v.remove(x);
-                    v.remove(y);
-                    currentListsOfPairs.add(new Pair<>(x, y));
-                    listPairs(v, currentListsOfPairs, listsOfPairs);
+    public List<List<Pair<Node, Node>>> listPairs(Set<Node> V, List<Pair<Node, Node>> currentListOfPairs,
+                                                  List<List<Pair<Node, Node>>> listsOfPairs) {
+        System.out.println("Begin: "+listsOfPairs);
+        if (V.isEmpty()) {
+            System.out.println("empty "+currentListOfPairs);
+            listsOfPairs.add(new ArrayList<>(currentListOfPairs));
+        } else {
+            Node x = V.iterator().next();
+            V.remove(x);
+            Set<Node> remainingNodes = new HashSet<>(V);
+            for (Node y : remainingNodes) {
+                if (x.compareTo(y) < 0) {
+                    V.remove(y);
+                    currentListOfPairs.add(new Pair<>(x, y));
+                    System.out.println("currentListOfPairs "+currentListOfPairs);
+                    listPairs(V, currentListOfPairs, listsOfPairs);
+                    currentListOfPairs.remove(currentListOfPairs.size() - 1);
+                    V.add(y);
                 }
             }
+            V.add(x);
         }
         return listsOfPairs;
     }
