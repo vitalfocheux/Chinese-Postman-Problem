@@ -84,7 +84,7 @@ public class UndirectedGraph extends Graph{
     public boolean removeEdge(int fromId, int toId, int weight) { return super.removeEdge(getNode(fromId), getNode(toId), weight) && super.removeEdge(getNode(toId), getNode(fromId), weight);}
 
     @Override
-    public boolean removeEdge(Edge e) { return super.removeEdge(e) && super.removeEdge(e.to(), e.from()); }
+    public boolean removeEdge(Edge e) { return super.removeEdge(e); }
 
 
     @Override

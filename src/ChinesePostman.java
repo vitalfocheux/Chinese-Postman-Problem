@@ -55,7 +55,7 @@ public class ChinesePostman {
     public List<Node> euler2(UndirectedGraph g, Node x){
         System.out.println("Start with :");
         System.out.println(g.toDotString());
-        System.out.println(x);
+        System.out.println("Node : "+x);
         List<Node> trail = new ArrayList<>();
         trail.add(x);
         List<Edge> edges = g.getOutEdges(x);
@@ -64,28 +64,26 @@ public class ChinesePostman {
             return trail;
         }
         while(!edges.isEmpty()){
-            System.out.println(g.getIncidentEdges(3));
             System.out.println("  edges now:"+edges);
-            System.out.println("trail before remove: "+trail);
+            System.out.println("  trail before remove: "+trail);
             Edge e = edges.get(0);
+            System.out.println("  current edge : "+e);
             if(trail.get(trail.size()-1).equals(e.to())){
                 x = e.from();
             }else{
                 x = e.to();
             }
-            if(edges.size() > 1){
-                System.out.println(e.equals(edges.get(1)));
-            }
-
-            g.removeEdge(e);
-            System.out.println("edge remove: "+e);
+            System.out.println(g.getIncidentEdges(e.from()));
+            System.out.println("  REMOVE "+g.removeEdge(e.from(),e.to()));
+            System.out.println(g.getIncidentEdges(e.from()));
+            System.out.println("  edge remove: "+e);
             System.out.println(g.toDotString());
             System.out.println("  edges after:"+edges);
             trail.add(x);
             edges = g.getOutEdges(x);
             System.out.println("  new edges now:"+edges);
             System.out.println("  trail now:"+trail);
-            System.out.println("  y now:"+x.getId());
+            System.out.println("y now:"+x.getId());
         }
         System.out.println("TRAIL IN THE END: "+trail);
         List<Node> trail_prime = new ArrayList<>();
