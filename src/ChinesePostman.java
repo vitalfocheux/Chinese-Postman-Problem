@@ -8,6 +8,7 @@ public class ChinesePostman {
 
     private final Integer INFINITY = Integer.MAX_VALUE;
     private String type = "";
+    private int extraCost = 0;
 
     UndirectedGraph graph;
 
@@ -54,6 +55,55 @@ public class ChinesePostman {
         return graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2;
     }
 
+    public String createLabel(List<Node> circuit){
+        String label = "label=Type: "+type+"\n\t";
+        int totalCost = 0;
+        switch (type){
+            case "Eulerian":
+                label += "Eulerian Trail: ";
+                break;
+            case "Semi-Eulerian":
+                label += "Semi-Eulerian Trail: ";
+                break;
+            case "Non Eulerian":
+                label += "Chinese Circuit: ";
+                break;
+        }
+        label += "[";
+        List<Edge> visited = new ArrayList<>();
+        //System.err.println(circuit);
+        for(int i = 0; i < circuit.size()-1; ++i){
+            boolean reversed = false;
+            //System.err.print(circuit.get(i).getId()+" "+circuit.get(i+1).getId()+" ");
+            List<Edge> edges = graph.getEdges(circuit.get(i).getId(), circuit.get(i+1).getId());
+            if(edges.isEmpty()){
+                reversed = true;
+                //System.err.print("\tempty\t");
+                edges = graph.getEdges(circuit.get(i+1).getId(), circuit.get(i).getId());
+            }
+            //System.err.print(edges+"\t");
+            Edge edge = edges.get(0);
+            if(reversed){
+                edge = edge.getSymmetric();
+            }
+            if(!visited.contains(edge)){
+                label += edge.toCircuitString()+", ";
+                totalCost += edge.getWeight();
+                visited.add(edge);
+            }
+            //System.err.println(edge);
+            //System.err.println(edges);
+        }
+        label = label.substring(0, label.length()-2)+"]\n\t";
+        label += "Total Cost: "+totalCost;
+        label += "\n\tExtra Cost: "+extraCost;
+        return label;
+    }
+
+    public String createLabel(){
+        return createLabel(findEulerianWay());
+    }
+
     public List<Node> eulerianTrail(UndirectedGraph g, Node x){
         List<Node> trail = new ArrayList<>();
         trail.add(x);
@@ -98,13 +148,13 @@ public class ChinesePostman {
                 Node next = floyd_warshall.get(new Pair<>(curr, pair.getSecond())).getSecond();
                 Node futur_curr = floyd_warshall.get(new Pair<>(curr, next)).getSecond();
                 Integer weight = floyd_warshall.get(new Pair<>(curr, next)).getFirst();
-                //TODO: faire pour mettre la couleur red
-                graph.addEdge(curr.getId(), futur_curr.getId(), weight);
+                graph.addEdge(curr.getId(), futur_curr.getId(), weight, "red");
                 curr = futur_curr;
             }
         }
 //        System.out.println(graph.toDotString());
 //        System.out.println("extraCost: "+extraCost);
+        this.extraCost = extraCost;
         return eulerianTrail(start);
     }
 
