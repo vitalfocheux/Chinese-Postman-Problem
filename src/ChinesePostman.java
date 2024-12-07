@@ -79,7 +79,7 @@ public class ChinesePostman {
 
     public List<Node> euler2(Node start){
         UndirectedGraph g = graph.copy();
-        return euler2(g, start);
+        return euler2(g, g.getNode(start.getId()));
     }
 
     /**
