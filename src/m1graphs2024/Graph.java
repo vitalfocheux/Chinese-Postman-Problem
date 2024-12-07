@@ -486,6 +486,11 @@ public class Graph {
         addEdge(new Edge(fromId, toId, weight, this));
     }
 
+    public void addEdge(int fromId, int toId, int weight, String color) {
+        if (fromId <= 0 || toId <= 0) return;
+        addEdge(new Edge(fromId, toId, weight, this, color));
+    }
+
     /**
      * Adds an edge in the graph.
      * @param e the edge to add

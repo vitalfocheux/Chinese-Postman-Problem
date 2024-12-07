@@ -61,6 +61,11 @@ public class UndirectedGraph extends Graph{
         super.addEdge(toId, fromId, weight);
     }
 
+    public void addEdge(int fromId, int toId, int weight, String color){
+        super.addEdge(fromId, toId, weight, color);
+        super.addEdge(toId, fromId, weight, color);
+    }
+
     @Override
     public int nbEdges() {
         return super.nbEdges()/2;
