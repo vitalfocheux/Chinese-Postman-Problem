@@ -175,6 +175,24 @@ public class ChinesePostman {
         return new Pair<>(bestMatching, bestMatchingWeight);
     }
 
+    public Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatchingRandom(List<Node> v){
+        List<Pair<Node, Node>> matching = new ArrayList<>();
+        Integer weight = 0;
+        Map<Pair<Node, Node>, Pair<Integer, Node>> floyd_warshall = floydWarshall();
+        Random random = new Random();
+        while(!v.isEmpty()){
+            Node x = v.get(random.nextInt(v.size()));
+            v.remove(x);
+            Node y = v.get(random.nextInt(v.size()));
+            v.remove(y);
+            Pair<Node, Node> pair = new Pair<>(x, y);
+            weight += floyd_warshall.get(pair).getFirst();
+            matching.add(pair);
+        }
+
+        return new Pair<>(matching, weight);
+    }
+
     public List<List<Pair<Node, Node>>> listPairsOddNodes(Set<Node> v, List<Pair<Node, Node>> currentListOfPairs,
                                                   List<List<Pair<Node, Node>>> listsOfPairs) {
         if (v.isEmpty()) {
