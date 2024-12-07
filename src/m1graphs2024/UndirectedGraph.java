@@ -222,11 +222,9 @@ public class UndirectedGraph extends Graph{
     @Override
     public UndirectedGraph copy() {
         UndirectedGraph copy = new UndirectedGraph();
-        for (Node n: getAllNodes()) {
-            copy.addNode(new Node(copy, n.getId(), n.getName()));
-        }
         for (Edge e: getAllEdges()) {
             copy.addEdge(new Edge(e.from().getId(), e.to().getId(), e.getWeight(), copy));
+            copy.addEdge(new Edge(e.to().getId(),e.from().getId(), e.getWeight(), copy));
         }
         return copy;
     }
