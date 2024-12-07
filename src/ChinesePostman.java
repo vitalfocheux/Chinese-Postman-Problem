@@ -90,12 +90,11 @@ public class ChinesePostman {
     public Map<Pair<Node, Node>, Pair<Integer, Node>> floydWarshall(){
         List<Node> nodes = graph.getAllNodes();
         Map<Pair<Node, Node>, Pair<Integer, Node>> res = new HashMap<>();
-        System.out.println(graph.toDotString());
         for(Node x : nodes){
             for(Node y : nodes){
                 Pair<Node, Node> pair = new Pair<>(x, y);
                 List<Edge> edges = graph.getEdges(x, y);
-                System.out.println("edges: "+edges);
+                edges.addAll(graph.getEdges(y, x));
                 if(x.equals(y)){
                     res.put(pair, new Pair<>(0, x));
                 }else if(!edges.isEmpty()){
@@ -111,10 +110,9 @@ public class ChinesePostman {
                 }
             }
         }
-        System.out.println(res.get(new Pair<>(new Node(graph, 1), new Node(graph, 1))));
-        for(Node z : nodes){
-            for(Node x : nodes){
-                for(Node y : nodes){
+        for(Node x : nodes){
+            for(Node y : nodes){
+                for(Node z : nodes){
                     Pair<Node, Node> xz = new Pair<>(x, z);
                     Pair<Node, Node> zy = new Pair<>(z, y);
                     Pair<Node, Node> xy = new Pair<>(x, y);
@@ -129,7 +127,6 @@ public class ChinesePostman {
                 }
             }
         }
-        System.out.println("blue");
         return res;
     }
 
