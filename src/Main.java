@@ -10,11 +10,8 @@ import java.util.Set;
 public class Main {
     public static void main(String[] args) {
 
-        UndirectedGraph g = UndirectedGraph.fromDotFile("tc1");
+        UndirectedGraph g = UndirectedGraph.fromDotFile("semiEulerian");
         ChinesePostman c = new ChinesePostman(g);
-        //System.out.println("Eulerian Trail: " + c.findEulerianWay());
-        System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
-        System.out.println(c.chineseCircuit(g.getNode(1)));
 
 //        List<Node> v = new ArrayList<>();
 //        for(Node n : g.getAllNodes()){
@@ -22,8 +19,17 @@ public class Main {
 //                v.add(n);
 //            }
 //        }
+//        System.out.println(v);
 //        Set<Node> nodes = new HashSet<>(v);
 //        System.out.println(c.listPairsOddNodes(nodes, new ArrayList<>(), new ArrayList<>()));
-//        System.out.println(c.lengthPairwiseMatching(v));
+//        System.out.println(c.lengthPairwiseMatchingRandom(v));
+
+        //System.out.println("Eulerian Trail: " + c.findEulerianWay());
+        //System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
+//        List<Node> circuit = c.findEulerianWay();
+//        System.out.println(circuit);
+        System.out.println("\t"+c.createLabel());
+
+
     }
 }
