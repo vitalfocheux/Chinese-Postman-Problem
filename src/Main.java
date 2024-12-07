@@ -5,7 +5,7 @@ import m1graphs2024.UndirectedGraph;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        UndirectedGraph g = UndirectedGraph.fromDotFile("semiEulerian");
+        UndirectedGraph g = UndirectedGraph.fromDotFile("eulerian");
         UndirectedGraph g2 = new UndirectedGraph();
         g2.addEdge(1,2, 3);
         g2.addEdge(1,3, 4);
@@ -17,7 +17,8 @@ public class Main {
 
         ChinesePostman c = new ChinesePostman(g);
         //System.out.println(c.solve());
-        System.out.println(c.euler2(g, g.getNode(3)));
+        System.out.println(c.euler2(g.getNode(3)));
 
+        System.out.println(c.floydWarshall());
     }
 }

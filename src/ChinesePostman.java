@@ -90,10 +90,12 @@ public class ChinesePostman {
     public Map<Pair<Node, Node>, Pair<Integer, Node>> floydWarshall(){
         List<Node> nodes = graph.getAllNodes();
         Map<Pair<Node, Node>, Pair<Integer, Node>> res = new HashMap<>();
+        System.out.println(graph.toDotString());
         for(Node x : nodes){
             for(Node y : nodes){
                 Pair<Node, Node> pair = new Pair<>(x, y);
                 List<Edge> edges = graph.getEdges(x, y);
+                System.out.println("edges: "+edges);
                 if(x.equals(y)){
                     res.put(pair, new Pair<>(0, x));
                 }else if(!edges.isEmpty()){
@@ -109,7 +111,7 @@ public class ChinesePostman {
                 }
             }
         }
-        System.err.println(res.get(new Pair<>(new Node(graph, 1), new Node(graph, 1))));
+        System.out.println(res.get(new Pair<>(new Node(graph, 1), new Node(graph, 1))));
         for(Node z : nodes){
             for(Node x : nodes){
                 for(Node y : nodes){
@@ -122,11 +124,12 @@ public class ChinesePostman {
                     Integer Mxy = res.get(xy).getFirst();
 
                     if(!Objects.equals(Mxz, INFINITY) && !Objects.equals(Mzy, INFINITY) && Mxz + Mzy < Mxy){
-                        res.put(zy, new Pair<>(res.get(xz).getFirst() + res.get(xy).getFirst(), x));
+                        res.put(xy, new Pair<>(res.get(xz).getFirst() + res.get(zy).getFirst(), z));
                     }
                 }
             }
         }
+        System.out.println("blue");
         return res;
     }
 
