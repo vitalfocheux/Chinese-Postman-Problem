@@ -22,16 +22,16 @@ public class ChinesePostman {
         return edges.get(0).getWeight();
     }
 
-    public List<Node> solve(){
+    public List<Node> findEulerianWay(){
         List<Node> nodes = graph.getAllNodes();
         if(graph.getDFS().size() == nodes.size()){
             if(isEulerian()){
                 System.out.println("Eulerian");
-                return euler2(new Node(graph, graph.smallestNodeId()));
+                return eulerianTrail(new Node(graph, graph.smallestNodeId()));
             }else if(isSemiEulerian()) {
                 System.out.println("Semi-Eulerian");
                 Node start = graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).findFirst().get();
-                return euler2(new Node(graph, start.getId()));
+                return eulerianTrail(new Node(graph, start.getId()));
             }
         }
         return new ArrayList<>();
@@ -52,7 +52,7 @@ public class ChinesePostman {
         return graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2;
     }
 
-    public List<Node> euler2(UndirectedGraph g, Node x){
+    public List<Node> eulerianTrail(UndirectedGraph g, Node x){
         List<Node> trail = new ArrayList<>();
         trail.add(x);
         List<Edge> edges = g.getOutEdges(x);
@@ -72,14 +72,14 @@ public class ChinesePostman {
         }
         List<Node> trail_prime = new ArrayList<>();
         for(int i = 0; i < trail.size(); ++i){
-            trail_prime.addAll(euler2(g, trail.get(i)));
+            trail_prime.addAll(eulerianTrail(g, trail.get(i)));
         }
         return trail_prime;
     }
 
-    public List<Node> euler2(Node start){
+    public List<Node> eulerianTrail(Node start){
         UndirectedGraph g = graph.copy();
-        return euler2(g, g.getNode(start.getId()));
+        return eulerianTrail(g, g.getNode(start.getId()));
     }
 
     /**
