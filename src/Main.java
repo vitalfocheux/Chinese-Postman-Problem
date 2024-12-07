@@ -22,6 +22,7 @@ public class Main {
             }
         }
         Set<Node> nodes = new HashSet<>(v);
-        System.out.println(c.listPairs(nodes, new ArrayList<>(), new ArrayList<>()));
+        System.out.println(c.listPairsOddNodes(nodes, new ArrayList<>(), new ArrayList<>()));
+        System.out.println(c.lengthPairwiseMatching(v));
     }
 }

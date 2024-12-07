@@ -136,7 +136,7 @@ public class ChinesePostman {
         v.sort(Comparator.comparing(Node::getId));
         List<Pair<Node, Node>> bestMatching = new ArrayList<>();
         Integer bestMatchingWeight = Integer.MAX_VALUE;
-        List<List<Pair<Node, Node>>> listPairwiseMatching = listPairs(new HashSet<>(v), new ArrayList<>(), new ArrayList<>());
+        List<List<Pair<Node, Node>>> listPairwiseMatching = listPairsOddNodes(new HashSet<>(v), new ArrayList<>(), new ArrayList<>());
         for(List<Pair<Node, Node>> pairs : listPairwiseMatching){
             Integer weight = 0;
             for(Pair<Node, Node> pair : pairs){
@@ -150,27 +150,27 @@ public class ChinesePostman {
         return new Pair<>(bestMatching, bestMatchingWeight);
     }
 
-    public List<List<Pair<Node, Node>>> listPairs(Set<Node> V, List<Pair<Node, Node>> currentListOfPairs,
+    public List<List<Pair<Node, Node>>> listPairsOddNodes(Set<Node> v, List<Pair<Node, Node>> currentListOfPairs,
                                                   List<List<Pair<Node, Node>>> listsOfPairs) {
-        System.out.println("Begin: "+listsOfPairs);
-        if (V.isEmpty()) {
-            System.out.println("empty "+currentListOfPairs);
+        if (v.isEmpty()) {
             listsOfPairs.add(new ArrayList<>(currentListOfPairs));
         } else {
-            Node x = V.iterator().next();
-            V.remove(x);
-            Set<Node> remainingNodes = new HashSet<>(V);
-            for (Node y : remainingNodes) {
-                if (x.compareTo(y) < 0) {
-                    V.remove(y);
+
+            Node x = v.stream().min(Node::compareTo).get();
+            System.out.println(x);
+            v.remove(x);
+            Set<Node> setNextNodes = new HashSet<>(v);
+            for (Node y : setNextNodes) {
+                if (x.getId() < y.getId()) {
+                    v.remove(y);
                     currentListOfPairs.add(new Pair<>(x, y));
-                    System.out.println("currentListOfPairs "+currentListOfPairs);
-                    listPairs(V, currentListOfPairs, listsOfPairs);
+
+                    listPairsOddNodes(v, currentListOfPairs, listsOfPairs);
                     currentListOfPairs.remove(currentListOfPairs.size() - 1);
-                    V.add(y);
+                    v.add(y);
                 }
             }
-            V.add(x);
+            v.add(x);
         }
         return listsOfPairs;
     }
