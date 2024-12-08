@@ -30,6 +30,15 @@ public class Main {
         System.out.println("\t"+c.createLabel()+"\n\n\n");
 
 
+        System.out.println("\nSecond eulerian multi graph:\n");
+        g = UndirectedGraph.fromDotFile("eulerianMulti2");
+        c = new ChinesePostman(g);
+        System.out.println(g.toDotString());
+        System.out.println("Eulerian Trail: " + c.findEulerianWay());
+        System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
+        System.out.println("\t"+c.createLabel()+"\n\n\n");
+
+
         System.out.println("Eulerian multi graph with self-loop:\n");
         g = UndirectedGraph.fromDotFile("eulerianMultiWithSelfLoop");
         c = new ChinesePostman(g);
@@ -80,8 +89,8 @@ public class Main {
         System.out.println(g.toDotString());
         System.out.println("Eulerian Trail: " + c.findEulerianWay());
         System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
-        System.out.println("\t"+c.createLabel());
-        System.out.println("tc1 after modifications:\n"+g.toDotString());
+        g.setLabel(c.createLabel());
+        System.out.println("\ntc1 after modifications:\n"+g.toDotString());
 
 
 

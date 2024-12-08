@@ -56,7 +56,7 @@ public class ChinesePostman {
     }
 
     public String createLabel(List<Node> circuit){
-        String label = "label=Type: "+type+"\n\t";
+        String label = "Type: "+type+"\n\t";
         int totalCost = 0;
         switch (type){
             case "Eulerian":
