@@ -564,7 +564,7 @@ public class Graph {
      * @return a list of outgoing edges, or an empty list if no edges exist
      */
     public List<Edge> getOutEdges(Node n) {
-        return adjEgList.get(n) == null ? new ArrayList<Edge>() : adjEgList.get(n);
+        return adjEgList.get(n) == null ? new ArrayList<>() : adjEgList.get(n);
     }
 
     /**
