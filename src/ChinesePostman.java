@@ -26,8 +26,6 @@ public class ChinesePostman {
     }
 
     public List<Node> findEulerianWay(){
-        List<Node> nodes = graph.getAllNodes();
-        System.out.println("DISCONNECt: "+graph.isDisconnectedGraph());
         if(!graph.isDisconnectedGraph()){
             if(isEulerian()){
                 type ="Eulerian";
