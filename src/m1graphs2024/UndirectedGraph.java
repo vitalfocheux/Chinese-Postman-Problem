@@ -1,8 +1,9 @@
 package m1graphs2024;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents an undirected graph data structure, supporting multigraphs (multiple edges between nodes)
@@ -135,6 +136,20 @@ public class UndirectedGraph extends Graph{
     }
 
     @Override
+    public List<Node> getSuccessors(Node n) {
+        List<Edge> edges = getIncidentEdges(n.getId());
+        //System.out.println("SUCC EDGES of "+n+": "+edges);
+        Set<Node> successors = new HashSet<>();
+        for (Edge e : edges) {
+            successors.add(e.to());
+            successors.add(e.from());
+        }
+        List<Node> res = new ArrayList<>(successors);
+        Collections.sort(res);
+        return res;
+    }
+
+    @Override
     public List<Node> getSuccessorsMulti(Node n) {
         List<Edge> edges = getOutEdges(n);
         List<Node> successors = new ArrayList<Node>();
@@ -250,60 +265,71 @@ public class UndirectedGraph extends Graph{
      * @return a Graph instance created from the file, or null if the file cannot be read
      */
     public static UndirectedGraph fromDotFile(String filename, String extension) {
-        UndirectedGraph graph = null;
-        if (!(extension.equals(".gv")) && !(extension.equals(".dot"))) return graph;
-        File file = new File("./ressources/" + filename + extension);
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        graph = new UndirectedGraph(); // Initialize an empty graph
-
-        while (scanner.hasNext()) {
-            String token = scanner.next();
-
-            if (token.equals("graph") || token.equals("{") || token.equals("rankdir=LR")) {
-                continue;
-            }else if (token.equals("}")) {
-                break;
-            }
-
-            // Parse nodes and edges
-            try {
-                int from = Integer.parseInt(token); // Read the first node
-                scanner.next(); // Skip the "--"
-                int to = scanner.nextInt(); // Read the second node
-
-                // Check for attributes (label, len)
-                String attributes = scanner.findInLine("\\[.*?\\]");
-                Integer weight = null;
-                if (attributes != null) {
-                    // Parse the "label" attribute if present
-                    String[] parts = attributes.replace("[", "").replace("]", "").split(",");
-                    for (String part : parts) {
-                        String[] keyValue = part.split("=");
-                        if (keyValue[0].trim().equals("label") || keyValue[0].trim().equals("len")) {
-                            weight = Integer.parseInt(keyValue[1].trim());
+        UndirectedGraph graph = new UndirectedGraph();
+        String path = "./ressources/" + filename + extension;
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            String line;
+            boolean inGraph = false;
+            Pattern nodePattern = Pattern.compile("^\\s*(\\d+)\\s*(?:\\[.*\\])?\\s*$");
+            Pattern edgePattern = Pattern.compile("^\\s*(\\d+)\\s*(--{1,2})\\s*(\\d+)(?:\\s*\\[(.*)\\])?\\s*$");
+            Pattern weightPattern = Pattern.compile("label=(\\d+),\\s*len=(\\d+)");
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+                if (line.startsWith("digraph") || line.startsWith("graph")) {
+                    inGraph = true;
+                    continue;
+                }
+                if (line.equals("}")) {
+                    inGraph = false;
+                    continue;
+                }
+                if (!inGraph) {
+                    continue;
+                }
+                if (line.endsWith(";")) {
+                    line = line.substring(0, line.length() - 1);
+                }
+                Matcher nodeMatcher = nodePattern.matcher(line);
+                if (nodeMatcher.matches()) {
+                    int nodeId = Integer.parseInt(nodeMatcher.group(1));
+                    graph.addNode(nodeId);
+                    continue;
+                }
+                Matcher edgeMatcher = edgePattern.matcher(line);
+                if (edgeMatcher.matches()) {
+                    int fromId = Integer.parseInt(edgeMatcher.group(1));
+                    int toId = Integer.parseInt(edgeMatcher.group(3));
+                    Node from = graph.getNode(fromId);
+                    if (from == null) {
+                        from = new Node(graph, fromId);
+                        graph.addNode(from);
+                    }
+                    Node to = graph.getNode(toId);
+                    if (to == null) {
+                        to = new Node(graph, toId);
+                        graph.addNode(to);
+                    }
+                    Integer weight = null;
+                    String attributes = edgeMatcher.group(4);
+                    if (attributes != null) {
+                        Matcher weightMatcher = weightPattern.matcher(attributes);
+                        if (weightMatcher.matches()) {
+                            int labelWeight = Integer.parseInt(weightMatcher.group(1));
+                            int lenWeight = Integer.parseInt(weightMatcher.group(2));
+                            if (labelWeight == lenWeight) {
+                                weight = labelWeight;
+                            }
                         }
                     }
+                    graph.addEdge(new Edge(from, to, weight));
                 }
-
-                // Add the nodes and edge to the graph
-                graph.addNode(from);
-                graph.addNode(to);
-                if (weight != null) {
-                    graph.addEdge(from, to, weight);
-                } else {
-                    graph.addEdge(from, to);
-                }
-            } catch (NumberFormatException | IllegalStateException e) {
-                // Handle potential parsing issues
-                System.err.println("Error parsing line: " + token);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading DOT file: " + e.getMessage());
         }
-        scanner.close();
         return graph;
     }
 

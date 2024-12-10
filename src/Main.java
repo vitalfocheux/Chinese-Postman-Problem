@@ -2,9 +2,7 @@ import m1graphs2024.Node;
 import m1graphs2024.UndirectedGraph;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class Main {
@@ -78,9 +76,23 @@ public class Main {
         g = UndirectedGraph.fromDotFile("tc1");
         c = new ChinesePostman(g);
         System.out.println(g.toDotString());
-        System.out.println("Eulerian Trail: " + c.findEulerianWay());
+        List<Node> findEulerianWay = c.findEulerianWay();
+        System.out.println("Eulerian Trail: " + findEulerianWay);
         System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
-        System.out.println("\t"+c.createLabel());
+        System.out.println("\t"+c.createLabel(findEulerianWay));
+        System.out.println("tc1 after modifications:\n"+g.toDotString());
+
+        System.out.println("disjoiny example:\n");
+        g = UndirectedGraph.fromDotFile("disjointGraph");
+//        for(Node n : g.getAllNodes()){
+//            System.out.println(g.getSuccessors(n));
+//        }
+        c = new ChinesePostman(g);
+        System.out.println(g.toDotString());
+        findEulerianWay = c.findEulerianWay();
+        System.out.println("Eulerian Trail: " + findEulerianWay);
+        System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
+        System.out.println("\t"+c.createLabel(findEulerianWay));
         System.out.println("tc1 after modifications:\n"+g.toDotString());
 
 

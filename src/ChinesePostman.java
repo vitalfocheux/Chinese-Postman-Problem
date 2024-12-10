@@ -3,6 +3,7 @@ import m1graphs2024.UndirectedGraph;
 import m1graphs2024.Node;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ChinesePostman {
 
@@ -26,22 +27,23 @@ public class ChinesePostman {
 
     public List<Node> findEulerianWay(){
         List<Node> nodes = graph.getAllNodes();
-        if(graph.getDFS().size() == nodes.size()){
+        System.out.println("DISCONNECt: "+graph.isDisconnectedGraph());
+        if(!graph.isDisconnectedGraph()){
             if(isEulerian()){
                 type ="Eulerian";
                 return eulerianTrail(new Node(graph, graph.smallestNodeId()));
-            }else if(isSemiEulerian()) {
+            }
+            if(isSemiEulerian()) {
                 type = "Semi-Eulerian";
                 Node start = graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).findFirst().get();
                 return eulerianTrail(new Node(graph, start.getId()));
             }
+            //System.out.println("Chinese Circuit");
+            type = "Non Eulerian";
+            return chineseCircuit(new Node(graph, graph.smallestNodeId()));
         }
-        type = "Non Eulerian";
-        return chineseCircuit(new Node(graph, graph.smallestNodeId()));
-    }
-
-    private boolean isConnected(){
-        return graph.getDFS().size() == graph.getAllNodes().size();
+        type = "Non connect graph";
+        return new ArrayList<>();
     }
 
     public boolean isEulerian(){
@@ -49,9 +51,6 @@ public class ChinesePostman {
     }
 
     public boolean isSemiEulerian(){
-        if(!isConnected()){
-            return false;
-        }
         return graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2;
     }
 
@@ -76,12 +75,12 @@ public class ChinesePostman {
             boolean reversed = false;
             //System.err.print(circuit.get(i).getId()+" "+circuit.get(i+1).getId()+" ");
             List<Edge> edges = graph.getEdges(circuit.get(i).getId(), circuit.get(i+1).getId());
+            //System.err.print("EDGES F "+edges);
             if(edges.isEmpty()){
                 reversed = true;
                 //System.err.print("\tempty\t");
                 edges = graph.getEdges(circuit.get(i+1).getId(), circuit.get(i).getId());
             }
-            //System.err.print(edges+"\t");
             Edge edge = edges.get(0);
             if(reversed){
                 edge = edge.getSymmetric();
@@ -164,6 +163,9 @@ public class ChinesePostman {
      * is a pair with the length of the shortest path and the predecessor node
      */
     public Map<Pair<Node, Node>, Pair<Integer, Node>> floydWarshall(){
+        if(graph.isDisconnectedGraph()){
+            return null;
+        }
         List<Node> nodes = graph.getAllNodes();
         Map<Pair<Node, Node>, Pair<Integer, Node>> res = new HashMap<>();
         for(Node x : nodes){

@@ -767,9 +767,9 @@ public class Graph {
         Set<Node> visited = new HashSet<>(getDescendents(smallestNodeId()));
         visited.add(getNode(smallestNodeId()));
         for (Node n : getAllNodes()) {
-            if (!visited.contains(n) && n.getIncidentEdges().size() != 0) return false;
+            if (!visited.contains(n) && n.getIncidentEdges().size() != 0) return true;
         }
-        return true;
+        return false;
     }
 
 
