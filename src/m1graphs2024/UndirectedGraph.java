@@ -364,6 +364,8 @@ public class UndirectedGraph extends Graph{
             }
             oneOnTwo = true;
         }
+        if (label != null)
+            res.append("\n\tlabel=\"").append(label).append("\"");
         return res.append("\n}").toString();
     }
 

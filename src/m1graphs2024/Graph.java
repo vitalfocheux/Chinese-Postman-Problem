@@ -18,6 +18,7 @@ import java.util.List;
 public class Graph {
     private Map<Node, List<Edge>> adjEgList;
     private String name;
+    protected String label;
 
     // Constructors
     /**
@@ -90,6 +91,22 @@ public class Graph {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Retrieves the label of the graph.
+     * @return the label of the graph, or an empty string if the label is null
+     */
+    public String getLabel() {
+        return label == null ? "" : label;
+    }
+
+    /**
+     * Sets the label of the graph.
+     * @param label the new label for the graph
+     */
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     // Node management methods
@@ -1151,6 +1168,8 @@ public class Graph {
                 res.append("\n\t").append(e.toString());
             }
         }
+        if (label != null)
+            res.append("\n\tlabel=\"").append(label).append("\"");
         return res.append("\n}").toString();
     }
 
