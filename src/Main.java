@@ -22,13 +22,14 @@ public class Main {
                 UndirectedGraph g = UndirectedGraph.fromDotFile(filename, extension);
                 ChinesePostman c = new ChinesePostman(g);
                 boolean random = false;
+                System.out.println(g.toDotString());
                 if(g.isDisconnectedGraph()) {
                     System.out.println("The graph is disconnected, it is impossible to compute the Chinese Circuit");
                     continue;
                 }
                 List<Node> findEulerianWay = new ArrayList<>();
                 if(!c.isEulerian() && !c.isSemiEulerian()){
-                    System.out.print("Choose the method to compute the Chinese Circuit (1: Normal method, 2: Random): ");
+                    System.out.print("Choose the method to compute the Chinese Circuit (1: Optimal method, 2: Random method): ");
                     random = (scanner.nextInt() == 2);
                     System.out.println("Floyd-Warshall Matrix: " + c.floydWarshall());
                     findEulerianWay = c.findEulerianWay(random);
