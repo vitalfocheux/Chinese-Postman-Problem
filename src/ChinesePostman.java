@@ -37,7 +37,7 @@ public class ChinesePostman {
                 return eulerianTrail(new Node(graph, start.getId()));
             }
             type = "Non Eulerian";
-            return chineseCircuit(new Node(graph, graph.smallestNodeId()), false);
+            return chineseCircuit(new Node(graph, graph.smallestNodeId()), random);
         }
         type = "Non connect graph";
         return new ArrayList<>();
@@ -183,7 +183,12 @@ public class ChinesePostman {
         List<Node> oddNodes = new ArrayList<>();
         graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).forEach(oddNodes::add);
 
-        Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching = random ? lengthPairwiseMatchingRandom(oddNodes) : lengthPairwiseMatching(oddNodes); //lengthPairwiseMatching(oddNodes);
+        Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching = null;
+        if(random){
+            lengthPairwiseMatching = lengthPairwiseMatchingRandom(oddNodes);
+        }else{
+            lengthPairwiseMatching = lengthPairwiseMatching(oddNodes);
+        }
         List<Pair<Node, Node>> bestMatching = lengthPairwiseMatching.getFirst();
         int extraCost = lengthPairwiseMatching.getSecond();
         for(Pair<Node, Node> pair : bestMatching){
