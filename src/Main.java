@@ -12,13 +12,14 @@ public class Main {
 
         while(true){
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter the name of the file (precise the extension format): ");
+            System.out.print("Enter the name of the file : ");
             String filename = scanner.nextLine();
-            String path = "./ressources/"+filename;
+            System.out.print("Choose the extension of the file "+filename+": ");
+            String extension = "."+scanner.nextLine();
+            String path = "./ressources/"+filename+extension;
             File file = new File(path);
             if(file.exists()){
-                String[] split = filename.split("\\.");
-                UndirectedGraph g = UndirectedGraph.fromDotFile(split[0], ("."+split[1]));
+                UndirectedGraph g = UndirectedGraph.fromDotFile(filename, extension);
                 ChinesePostman c = new ChinesePostman(g);
                 boolean random = false;
                 if(g.isDisconnectedGraph()) {
@@ -47,7 +48,8 @@ public class Main {
                 System.out.println("The file "+filename+" does not exist in the directory ressources");
             }
             System.out.print("Do you want to continue (y/n): ");
-            if(scanner.nextLine().equals("n")){
+            String answer = scanner.next();
+            if(answer.equals("n")){
                 break;
             }
         }
