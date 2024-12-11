@@ -273,6 +273,7 @@ public class UndirectedGraph extends Graph{
             Pattern nodePattern = Pattern.compile("^\\s*(\\d+)\\s*(?:\\[.*\\])?\\s*$");
             Pattern edgePattern = Pattern.compile("^\\s*(\\d+)\\s*(--{1,2})\\s*(\\d+)(?:\\s*\\[(.*)\\])?\\s*$");
             Pattern weightPattern = Pattern.compile("label=(\\d+),\\s*len=(\\d+)");
+            Pattern weight2Pattern = Pattern.compile("len=(\\d+)");
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty() || line.startsWith("#")) {
@@ -316,12 +317,16 @@ public class UndirectedGraph extends Graph{
                     String attributes = edgeMatcher.group(4);
                     if (attributes != null) {
                         Matcher weightMatcher = weightPattern.matcher(attributes);
+                        Matcher weight2Matcher = weight2Pattern.matcher(attributes);
                         if (weightMatcher.matches()) {
                             int labelWeight = Integer.parseInt(weightMatcher.group(1));
                             int lenWeight = Integer.parseInt(weightMatcher.group(2));
                             if (labelWeight == lenWeight) {
                                 weight = labelWeight;
                             }
+                        }
+                        if (weight2Matcher.matches()) {
+                            weight = Integer.parseInt(weight2Matcher.group(1));
                         }
                     }
                     graph.addEdge(new Edge(from, to, weight));

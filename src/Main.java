@@ -11,7 +11,7 @@ public class Main {
         // Eulerian graph
 
         System.out.println("\nEulerian graph:\n");
-        UndirectedGraph g = UndirectedGraph.fromDotFile("eulerian");
+        UndirectedGraph g = UndirectedGraph.fromDotFile("graph");
         ChinesePostman c = new ChinesePostman(g);
         System.out.println(g.toDotString());
         System.out.println("Eulerian Trail: " + c.findEulerianWay());
@@ -70,7 +70,7 @@ public class Main {
         System.out.println("\ntc1 after modifications:\n"+g.toDotString());
 
         System.out.println("disjoiny example:\n");
-        g = UndirectedGraph.fromDotFile("disjointGraph");
+        g = UndirectedGraph.fromDotFile("graph");
 //        for(Node n : g.getAllNodes()){
 //            System.out.println(g.getSuccessors(n));
 //        }
