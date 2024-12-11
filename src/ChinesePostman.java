@@ -185,33 +185,22 @@ public class ChinesePostman {
 
         Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching = null;
         if(random){
-            System.out.println("RANDOM");
             lengthPairwiseMatching = lengthPairwiseMatchingRandom(oddNodes);
         }else{
-            System.out.println("OPTIMAL");
             lengthPairwiseMatching = lengthPairwiseMatching(oddNodes);
         }
         List<Pair<Node, Node>> bestMatching = lengthPairwiseMatching.getFirst();
         int extraCost = lengthPairwiseMatching.getSecond();
-        System.out.println("Best Matching: "+lengthPairwiseMatching);
         for(Pair<Node, Node> pair : bestMatching){
             Node from = pair.getFirst();
             Node curr = from;
-            System.out.println("FROM: "+from);
             while(!curr.equals(pair.getSecond())){
                 Node next = floyd_warshall.get(new Pair<>(curr, pair.getSecond())).getSecond();
                 Node futur_curr = floyd_warshall.get(new Pair<>(curr, next)).getSecond();
                 while(!futur_curr.equals(floyd_warshall.get(new Pair<>(curr, futur_curr)).getSecond())){
                     futur_curr = floyd_warshall.get(new Pair<>(curr, futur_curr)).getSecond();
                 }
-                //List<Edge> edges = graph.getEdges(curr, next);
-                //if(edges.isEmpty()){
-                //    edges = graph.getEdges(next, curr);
-                //}
-                //System.out.println("Edges: "+edges);
-                System.out.print("From: "+curr+" To: "+next+" Next: "+futur_curr);
                 Integer weight = floyd_warshall.get(new Pair<>(curr, futur_curr)).getFirst();
-                System.out.println(" Weight: "+weight);
                 graph.addEdge(curr.getId(), futur_curr.getId(), weight, "red");
                 curr = futur_curr;
             }
@@ -266,7 +255,7 @@ public class ChinesePostman {
                     Integer Mxy = res.get(xy).getFirst();
 
                     if(!Objects.equals(Mxz, INFINITY) && !Objects.equals(Mzy, INFINITY) && Mxz + Mzy < Mxy){
-                        res.replace(xy, new Pair<>(res.get(xz).getFirst() + res.get(zy).getFirst(), z));
+                        res.put(xy, new Pair<>(res.get(xz).getFirst() + res.get(zy).getFirst(), z));
                     }
                 }
             }
@@ -321,12 +310,18 @@ public class ChinesePostman {
             Node y = v.get(random.nextInt(v.size()));
             v.remove(y);
             Pair<Node, Node> pair = new Pair<>(x, y);
-            System.out.print("PAIR: "+pair);
-            System.out.println(" WEIGHT RANDOM: "+floyd_warshall.get(pair).getFirst());
-            weight += floyd_warshall.get(pair).getFirst();
             matching.add(pair);
+            Node curr = pair.getFirst();
+            while(!curr.equals(pair.getSecond())){
+                Node next = floyd_warshall.get(new Pair<>(curr, pair.getSecond())).getSecond();
+                Node futur_curr = floyd_warshall.get(new Pair<>(curr, next)).getSecond();
+                while(!futur_curr.equals(floyd_warshall.get(new Pair<>(curr, futur_curr)).getSecond())){
+                    futur_curr = floyd_warshall.get(new Pair<>(curr, futur_curr)).getSecond();
+                }
+                weight += floyd_warshall.get(new Pair<>(curr, futur_curr)).getFirst();
+                curr = futur_curr;
+            }
         }
-        System.out.println("WEIGHT RANDOM: "+weight);
         return new Pair<>(matching, weight);
     }
 

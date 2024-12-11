@@ -138,7 +138,6 @@ public class UndirectedGraph extends Graph{
     @Override
     public List<Node> getSuccessors(Node n) {
         List<Edge> edges = getIncidentEdges(n.getId());
-        //System.out.println("SUCC EDGES of "+n+": "+edges);
         Set<Node> successors = new HashSet<>();
         for (Edge e : edges) {
             successors.add(e.to());
