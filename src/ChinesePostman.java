@@ -25,7 +25,7 @@ public class ChinesePostman {
         return edges.get(0).getWeight();
     }
 
-    public List<Node> findEulerianWay(){
+    public List<Node> findEulerianWay(boolean random){
         if(!graph.isDisconnectedGraph()){
             if(isEulerian()){
                 type ="Eulerian";
@@ -38,10 +38,14 @@ public class ChinesePostman {
             }
             //System.out.println("Chinese Circuit");
             type = "Non Eulerian";
-            return chineseCircuit(new Node(graph, graph.smallestNodeId()));
+            return chineseCircuit(new Node(graph, graph.smallestNodeId()), false);
         }
         type = "Non connect graph";
         return new ArrayList<>();
+    }
+
+    public List<Node> findEulerianWay(){
+        return findEulerianWay(false);
     }
 
     public boolean isEulerian(){
@@ -131,11 +135,12 @@ public class ChinesePostman {
         return eulerianTrail(g, g.getNode(start.getId()));
     }
 
-    public List<Node> chineseCircuit(Node start){
+    public List<Node> chineseCircuit(Node start, boolean random){
         Map<Pair<Node, Node>, Pair<Integer, Node>> floyd_warshall = floydWarshall();
         List<Node> oddNodes = new ArrayList<>();
         graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).forEach(oddNodes::add);
-        Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching = lengthPairwiseMatching(oddNodes);
+
+        Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching = random ? lengthPairwiseMatchingRandom(oddNodes) : lengthPairwiseMatching(oddNodes); //lengthPairwiseMatching(oddNodes);
         List<Pair<Node, Node>> bestMatching = lengthPairwiseMatching.getFirst();
         int extraCost = lengthPairwiseMatching.getSecond();
         for(Pair<Node, Node> pair : bestMatching){
