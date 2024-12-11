@@ -46,6 +46,10 @@ public class Main {
             }else{
                 System.out.println("The file "+filename+" does not exist in the directory ressources");
             }
+            System.out.print("Do you want to continue (y/n): ");
+            if(scanner.nextLine().equals("n")){
+                break;
+            }
         }
     }
 }
