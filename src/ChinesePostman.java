@@ -83,7 +83,7 @@ public class ChinesePostman {
         int totalCost = 0;
         switch (type){
             case "Eulerian":
-                label += "Eulerian Trail: ";
+                label += "Eulerian Circuit: ";
                 break;
             case "Semi-Eulerian":
                 label += "Semi-Eulerian Trail: ";
