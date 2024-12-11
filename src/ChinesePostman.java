@@ -3,7 +3,6 @@ import m1graphs2024.UndirectedGraph;
 import m1graphs2024.Node;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ChinesePostman {
 
@@ -17,14 +16,15 @@ public class ChinesePostman {
         this.graph = graph;
     }
 
-    private Integer weight(Node x, Node y){
-        List<Edge> edges = graph.getEdges(x, y);
-        if(edges.isEmpty()){
-            return null;
-        }
-        return edges.get(0).getWeight();
-    }
-
+    /**
+     * The function `findEulerianWay` checks if the graph is a disconnected graph, and then 
+     * determines if it is Eulerian, Semi-Eulerian, or Non-Eulerian. 
+     * Based on the type of graph, it returns either an Eulerian trail, a Chinese circuit,
+     * or an empty list otherwise.
+     * 
+     * @param random boolean
+     * @return A List of Node objects is being returned.
+     */
     public List<Node> findEulerianWay(boolean random){
         if(!graph.isDisconnectedGraph()){
             if(isEulerian()){
@@ -36,7 +36,6 @@ public class ChinesePostman {
                 Node start = graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).findFirst().get();
                 return eulerianTrail(new Node(graph, start.getId()));
             }
-            //System.out.println("Chinese Circuit");
             type = "Non Eulerian";
             return chineseCircuit(new Node(graph, graph.smallestNodeId()), false);
         }
@@ -44,18 +43,41 @@ public class ChinesePostman {
         return new ArrayList<>();
     }
 
+    /**
+     * The function `findEulerianWay` returns a list of nodes representing an Eulerian way in a graph.
+     * 
+     * @return List<Node>
+     */
     public List<Node> findEulerianWay(){
         return findEulerianWay(false);
     }
 
+    /**
+     * The function checks if all nodes in a graph have even degrees, indicating that the graph is
+     * Eulerian.
+     * 
+     * @return boolean
+     */
     public boolean isEulerian(){
         return graph.getAllNodes().stream().allMatch(node -> graph.degree(node) % 2 == 0);
     }
 
+    /**
+     * The function checks if a graph is semi-Eulerian by verifying if there are exactly two nodes with
+     * odd degrees.
+     * 
+     * @return boolean
+     */
     public boolean isSemiEulerian(){
         return graph.getAllNodes().stream().filter(node -> graph.degree(node) % 2 != 0).count() == 2;
     }
 
+    /**
+     * The function `createLabel` generates a label for a circuit based on the Eulerian circuit or trail given.
+     * 
+     * @param circuit List<Node>
+     * @return String
+     */
     public String createLabel(List<Node> circuit){
         String label = "Type: "+type+"\n\t";
         int totalCost = 0;
@@ -72,15 +94,11 @@ public class ChinesePostman {
         }
         label += "[";
         List<Edge> visited = new ArrayList<>();
-        //System.err.println(circuit);
         for(int i = 0; i < circuit.size()-1; ++i){
             boolean reversed = false;
-            //System.err.print(circuit.get(i).getId()+" "+circuit.get(i+1).getId()+" ");
             List<Edge> edges = graph.getEdges(circuit.get(i).getId(), circuit.get(i+1).getId());
-            //System.err.print("EDGES F "+edges);
             if(edges.isEmpty()){
                 reversed = true;
-                //System.err.print("\tempty\t");
                 edges = graph.getEdges(circuit.get(i+1).getId(), circuit.get(i).getId());
             }
             Edge edge = edges.get(0);
@@ -92,8 +110,6 @@ public class ChinesePostman {
                 totalCost += edge.getWeight();
                 visited.add(edge);
             }
-            //System.err.println(edge);
-            //System.err.println(edges);
         }
         label = label.substring(0, label.length()-2)+"]\n\t";
         label += "Total Cost: "+totalCost;
@@ -101,10 +117,23 @@ public class ChinesePostman {
         return label;
     }
 
+    /**
+     * The function createLabel() returns a label based on a Eulerian way.
+     * 
+     * @return String
+     */
     public String createLabel(){
         return createLabel(findEulerianWay());
     }
 
+    /**
+     * The function `eulerianTrail` finds an Eulerian trail in an undirected graph starting from a
+     * given node.
+     * 
+     * @param g UndirectedGraph
+     * @param x Node
+     * @return List<Node>
+     */
     public List<Node> eulerianTrail(UndirectedGraph g, Node x){
         List<Node> trail = new ArrayList<>();
         trail.add(x);
@@ -130,11 +159,25 @@ public class ChinesePostman {
         return trail_prime;
     }
 
+    /**
+     * The function `eulerianTrail` returns an Eulerian trail starting from a specified node in an undirected graph.
+     * 
+     * @param start Node
+     * @return List<Node>
+     */
     public List<Node> eulerianTrail(Node start){
         UndirectedGraph g = graph.copy();
         return eulerianTrail(g, g.getNode(start.getId()));
     }
 
+    /**
+     * The function `chineseCircuit` finds a Chinese postman circuit in a graph starting from a given
+     * node, using the Floyd-Warshall algorithm and pairwise matching of odd-degree nodes.
+     * 
+     * @param start Node
+     * @param random boolean
+     * @return List<Node>
+     */
     public List<Node> chineseCircuit(Node start, boolean random){
         Map<Pair<Node, Node>, Pair<Integer, Node>> floyd_warshall = floydWarshall();
         List<Node> oddNodes = new ArrayList<>();
@@ -154,16 +197,17 @@ public class ChinesePostman {
                 curr = futur_curr;
             }
         }
-//        System.out.println(graph.toDotString());
-//        System.out.println("extraCost: "+extraCost);
         this.extraCost = extraCost;
         return eulerianTrail(start);
     }
 
     /**
-     * Floyd-Warshall algorithm
-     * @return a map with the shortest path between each pair of nodes where the key is a pair of nodes and the value
-     * is a pair with the length of the shortest path and the predecessor node
+     * The function implements the Floyd-Warshall algorithm to find the shortest paths between all
+     * pairs of nodes in a graph.
+     * 
+     * @return a `Map` where the key is a `Pair` of Nodes representing the source and destination nodes, 
+     * and the value is a `Pair` containing an integer representing the shortest distance between the nodes 
+     * and a Node representing the intermediate node on the shortest path.
      */
     public Map<Pair<Node, Node>, Pair<Integer, Node>> floydWarshall(){
         if(graph.isDisconnectedGraph()){
@@ -211,6 +255,14 @@ public class ChinesePostman {
         return res;
     }
 
+    /**
+     * The function `lengthPairwiseMatching` finds the best pairwise matching of nodes in a list based
+     * on a given weight function.
+     * 
+     * @param v List<Node>
+     * @return a Pair containing a list of pairs of nodes representing the best match, 
+     * and an integer representing the total weight of the best matching.
+     */
     public Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatching(List<Node> v){
         v.sort(Comparator.comparing(Node::getId));
         List<Pair<Node, Node>> bestMatching = new ArrayList<>();
@@ -230,6 +282,15 @@ public class ChinesePostman {
         return new Pair<>(bestMatching, bestMatchingWeight);
     }
 
+    /**
+     * The function `lengthPairwiseMatchingRandom` randomly selects pairs of nodes from a list,
+     * calculates the weight using Floyd-Warshall algorithm, and returns the matching pairs along with
+     * the total weight.
+     * 
+     * @param v List<Node>
+     * @return A Pair containing a List of Pair objects representing pairwise matchings between
+     * nodes, and an Integer representing the total weight of the pairwise matchings.
+     */
     public Pair<List<Pair<Node, Node>>, Integer> lengthPairwiseMatchingRandom(List<Node> v){
         List<Pair<Node, Node>> matching = new ArrayList<>();
         Integer weight = 0;
@@ -244,10 +305,18 @@ public class ChinesePostman {
             weight += floyd_warshall.get(pair).getFirst();
             matching.add(pair);
         }
-
         return new Pair<>(matching, weight);
     }
 
+    /**
+     * The function recursively generates all possible pairs of odd nodes from a given set of nodes.
+     * 
+     * @param v Set<Node>
+     * @param currentListOfPairs List<Pair<Node, Node>>
+     * @param listsOfPairs List<List<Pair<Node, Node>>>
+     * @return The method `listPairsOddNodes` returns a `List<List<Pair<Node, Node>>>`, which contains
+     * a list of lists of pairs of nodes.
+     */
     public List<List<Pair<Node, Node>>> listPairsOddNodes(Set<Node> v, List<Pair<Node, Node>> currentListOfPairs,
                                                   List<List<Pair<Node, Node>>> listsOfPairs) {
         if (v.isEmpty()) {
@@ -272,10 +341,23 @@ public class ChinesePostman {
         return listsOfPairs;
     }
 
+    /**
+     * The function `computeEulerianCircuit` returns a list of edges representing an Eulerian circuit
+     * starting from the node with the smallest ID in the graph.
+     * 
+     * @return List<Edge>
+     */
     public List<Edge> computeEulerianCircuit(){
         return computeEulerianCircuit(graph.getNode(graph.smallestNodeId()));
     }
 
+    /**
+     * The function `computeEulerianCircuit` returns a list of edges representing an Eulerian circuit
+     * starting from the node with the smallest ID in the graph.
+     * 
+     * @param start Node
+     * @return List<Edge>
+     */
     public List<Edge> computeEulerianCircuit(Node start){
         List<Edge> circuit = new ArrayList<>();
         Stack<Node> stack = new Stack<>();
@@ -296,69 +378,4 @@ public class ChinesePostman {
         return circuit;
     }
 
-    /*public static ChinesePostman fromDotFile(String filename){
-        return fromDotFile(filename, "gv");
-    }
-
-    public static ChinesePostman fromDotFile(String filename, String extension){
-        UndirectedGraph g = new UndirectedGraph();
-        String path = filename + "." + extension;
-
-        Path startPath = Paths.get(System.getProperty("user.dir"));
-        String pattern = filename+"."+extension;
-        final String[] src = {""};
-
-        try {
-            Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (file.getFileName().toString().equals(pattern)) {
-                        if(!file.toAbsolutePath().toString().contains("out")){
-                            src[0] = file.toAbsolutePath().toString();
-                        }
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        StringBuilder dot = new StringBuilder();
-        try(BufferedReader br = new BufferedReader(new FileReader(src[0]))){
-
-            String line;
-            while((line = br.readLine()) != null){
-                if(line.contains("--")){
-                    //System.out.println(line);
-                    List<String> split = List.of(line.split("\\["));
-                    Pattern p = Pattern.compile("\\d+");
-                    Matcher matcher = p.matcher(split.get(1));
-                    int weight = 0;
-                    if (matcher.find()) {
-                        weight = Integer.parseInt(matcher.group());
-
-                        dot.append(split.get(0)).append(" [len=").append(matcher.group()).append(", label=").append(matcher.group()).append("]\n");
-                    } else {
-                        System.out.println("No number found in the string.");
-                    }
-
-                    List<String> nodes = List.of(split.get(0).split("--"));
-                    g.addEdge(Integer.parseInt(nodes.get(0).trim()), Integer.parseInt(nodes.get(1).trim()), weight);
-
-
-                }else{
-                    dot.append(line).append("\n");
-                }
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return new ChinesePostman(g);
-    }
-
-
-
-    public String toDotString(){
-        return null;
-    }*/
 }
